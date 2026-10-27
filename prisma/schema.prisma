@@ -1,0 +1,142 @@
+// HYROX CONTROL — Prisma Schema
+// Painel de controle de treinamento (prescrito vs. realizado) — Rafael Nogueira
+// SQLite: enums não são suportados → campos String validados na aplicação (src/lib/constants.ts)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Athlete {
+  id           String   @id @default(cuid())
+  name         String
+  birthDate    DateTime
+  heightCm     Float
+  weightKg     Float
+  bodyFatPct   Float
+  raceName     String
+  raceDate     DateTime
+  restingHr    Int?
+  maxHr        Int?
+  vo2max       Float? // mL/kg/min — teste incremental
+  vdot         Float?
+  vt1SpeedKmh  Float? // limiar aeróbico (VT1) km/h
+  vt2SpeedKmh  Float? // limiar anaeróbico (VT2) km/h
+  fiveKmPbSec  Int? // PB 5 km em segundos
+  goalRaceTime Int? // objetivo de prova em segundos
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Mesocycle {
+  id             String       @id @default(cuid())
+  code           String // DIAG | GPP1 | GPP2 | SPP1 | SPP2 | COMP | TAPER
+  name           String
+  order          Int
+  startDate      DateTime
+  endDate        DateTime
+  goal           String // objetivo do mesociclo
+  focus          String // focos separados por ";"
+  volumeTargetKm Float
+  intensityNote  String
+  keyWorkouts    String
+  microcycles    Microcycle[]
+}
+
+model Microcycle {
+  id                String           @id @default(cuid())
+  mesocycleId       String
+  mesocycle         Mesocycle        @relation(fields: [mesocycleId], references: [id], onDelete: Cascade)
+  weekNumber        Int // 1..28
+  startDate         DateTime // segunda-feira
+  endDate           DateTime // domingo
+  type              String // DESENVOLVIMENTO | REGENERATIVO | TESTE | FLEXIVEL | COMPETICAO
+  targetKm          Float
+  targetTonnageKg   Float
+  targetSessions    Int
+  note              String?
+  sessions          TrainingSession[]
+}
+
+model TrainingSession {
+  id                  String          @id @default(cuid())
+  microcycleId        String
+  microcycle          Microcycle      @relation(fields: [microcycleId], references: [id], onDelete: Cascade)
+  date                DateTime
+  dayIndex            Int // 1=Seg ... 7=Dom
+  type                String // FORCA | CORRIDA | LPO | PLIOMETRIA | HIBRIDO | TESTE | ATIVACAO | REGEN
+  title               String
+  description         String
+  hrZone              String? // ex.: "Z2", "Z3-Z4"
+  paceTarget          String? // ex.: "4:45-4:55/km (ritmo alvo)"
+  durationPrescribedMin Int
+  durationActualMin   Int?
+  kmPrescribed        Float?
+  kmActual            Float?
+  tonnagePrescribedKg Float?
+  tonnageActualKg     Float?
+  rpePrescribed       Int? // Borg CR-10
+  rpeActual           Int?
+  loadPrescribed      Int? // sRPE = RPE x duração (UA Foster)
+  loadActual          Int?
+  status              String          @default("PLANEJADO") // PLANEJADO | CONCLUIDO | PARCIAL | AJUSTADO | NAO_REALIZADO
+  notes               String? // observações do atleta
+  coachNote           String? // observações da comissão
+  updatedAt           DateTime        @updatedAt
+  exercises           Exercise[]
+  stations            StationResult[]
+}
+
+model Exercise {
+  id              String         @id @default(cuid())
+  sessionId       String
+  session         TrainingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  order           Int
+  name            String
+  category        String // FORCA | LPO | PLIOMETRIA | CORE | TECNICO
+  setsPrescribed  Int?
+  repsPrescribed  String? // "10", "8/lado", "45s"
+  loadPrescribedKg Float?
+  tempo           String?
+  rest            String?
+  setsActual      Int?
+  repsActual      String?
+  loadActualKg    Float?
+  notes           String?
+}
+
+model StationResult {
+  id                 String          @id @default(cuid())
+  sessionId          String
+  session            TrainingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  order              Int
+  station            String // RUN_1KM | SKIERG | SLED_PUSH | SLED_PULL | BBJ | ROWING | FARMERS | SANDBAG | WALLBALLS
+  label              String
+  distanceM          Int?
+  reps               Int?
+  loadKg             Float?
+  splitPrescribedSec Int?
+  splitActualSec     Int?
+  hrAvg              Int?
+  notes              String?
+}
+
+model Wellness {
+  id           String   @id @default(cuid())
+  date         DateTime @unique
+  sleepHours   Float?
+  sleepQuality Int? // 1-5
+  soreness     Int? // 1-5 (dor muscular)
+  fatigue      Int? // 1-5
+  stress       Int? // 1-5
+  motivation   Int? // 1-5
+  restingHr    Int?
+  hrv          Int? // ms (RMSSD)
+  weightKg     Float?
+  notes        String?
+}
