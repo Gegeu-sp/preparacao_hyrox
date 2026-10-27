@@ -229,3 +229,60 @@ export interface SessionPatchPayload {
     notes?: string | null
   }[]
 }
+
+// ---------- Preditor de Tempo de Prova HYROX ----------
+
+export type SegmentType = 'RUN' | 'STATION' | 'ROXZONE'
+
+export interface SegmentPredictionSplitDTO {
+  order: number
+  segmentKey: string
+  type: SegmentType
+  name: string
+  distanceM: number | null
+  reps: number | null
+  predictedSec: number
+  predictedFormatted: string
+  targetSec: number | null
+  targetFormatted: string | null
+  paceMinKmFormatted: string | null
+  fatigueFactorApplied: number
+  isCritical: boolean
+  historicalBestSec: number | null
+}
+
+export interface RacePredictionDTO {
+  generatedAt: string
+  athleteName: string
+  targetGoalTimeSec: number
+  targetGoalTimeFormatted: string
+  realisticTotalSec: number
+  realisticFormatted: string
+  optimisticTotalSec: number
+  optimisticFormatted: string
+  conservativeTotalSec: number
+  conservativeFormatted: string
+  totalRunSec: number
+  totalRunFormatted: string
+  totalStationsSec: number
+  totalStationsFormatted: string
+  roxzoneSec: number
+  roxzoneFormatted: string
+  deltaSec: number
+  deltaFormatted: string
+  deltaPct: number
+  isWithinGoal: boolean
+  confidenceLevel: 'ALTA' | 'MEDIA' | 'ESTIMATIVA_INICIAL'
+  simulationCountUsed: number
+  criticalStations: string[]
+  warnings: string[]
+  segments: SegmentPredictionSplitDTO[]
+}
+
+export interface PredictionScenarioInput {
+  basePaceAdjustmentSec?: number
+  stationAdjustments?: Record<string, number>
+  roxzoneAdjustmentSec?: number
+  customGoalTimeSec?: number
+}
+

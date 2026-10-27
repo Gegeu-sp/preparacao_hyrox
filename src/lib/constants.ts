@@ -110,3 +110,61 @@ export const RPE_SCALE_HINT: Record<number, string> = {
   9: 'Quase máximo (teste/simulação)',
   10: 'Máximo (prova)',
 }
+
+// ---------- Constantes do Preditor HYROX ----------
+
+export interface OfficialSegmentDef {
+  order: number
+  key: string
+  name: string
+  type: 'RUN' | 'STATION'
+  stationCode?: StationCode
+  distanceM?: number
+  reps?: number
+  description: string
+}
+
+export const HYROX_OFFICIAL_SEGMENTS: OfficialSegmentDef[] = [
+  { order: 1, key: 'RUN_1', name: 'Corrida 1', type: 'RUN', stationCode: 'RUN_1KM', distanceM: 1000, description: '1.000 m inicial em ritmo controlado' },
+  { order: 2, key: 'SKIERG', name: 'SkiErg', type: 'STATION', stationCode: 'SKIERG', distanceM: 1000, description: '1.000 m ergômetro de membros superiores' },
+  { order: 3, key: 'RUN_2', name: 'Corrida 2', type: 'RUN', stationCode: 'RUN_1KM', distanceM: 1000, description: '1.000 m pós-SkiErg' },
+  { order: 4, key: 'SLED_PUSH', name: 'Sled Push', type: 'STATION', stationCode: 'SLED_PUSH', distanceM: 50, description: '2 × 25 m (152 kg Open M)' },
+  { order: 5, key: 'RUN_3', name: 'Corrida 3', type: 'RUN', stationCode: 'RUN_1KM', distanceM: 1000, description: '1.000 m com queima intensa de quadríceps' },
+  { order: 6, key: 'SLED_PULL', name: 'Sled Pull', type: 'STATION', stationCode: 'SLED_PULL', distanceM: 50, description: '2 × 25 m (103 kg Open M)' },
+  { order: 7, key: 'RUN_4', name: 'Corrida 4', type: 'RUN', stationCode: 'RUN_1KM', distanceM: 1000, description: '1.000 m pós-Sled Pull' },
+  { order: 8, key: 'BBJ', name: 'Burpee Broad Jumps', type: 'STATION', stationCode: 'BBJ', distanceM: 80, description: '80 m saltos horizontais' },
+  { order: 9, key: 'RUN_5', name: 'Corrida 5', type: 'RUN', stationCode: 'RUN_1KM', distanceM: 1000, description: '1.000 m com estresse cardiovascular' },
+  { order: 10, key: 'ROWING', name: 'Rowing', type: 'STATION', stationCode: 'ROWING', distanceM: 1000, description: '1.000 m remo ergômetro' },
+  { order: 11, key: 'RUN_6', name: 'Corrida 6', type: 'RUN', stationCode: 'RUN_1KM', distanceM: 1000, description: '1.000 m pós-Remo' },
+  { order: 12, key: 'FARMERS', name: "Farmer's Carry", type: 'STATION', stationCode: 'FARMERS', distanceM: 200, description: '200 m (2 × 24 kg)' },
+  { order: 13, key: 'RUN_7', name: 'Corrida 7', type: 'RUN', stationCode: 'RUN_1KM', distanceM: 1000, description: '1.000 m antepenúltimo trecho' },
+  { order: 14, key: 'SANDBAG', name: 'Sandbag Lunges', type: 'STATION', stationCode: 'SANDBAG', distanceM: 100, description: '100 m passadas (20 kg Open M)' },
+  { order: 15, key: 'RUN_8', name: 'Corrida 8', type: 'RUN', stationCode: 'RUN_1KM', distanceM: 1000, description: '1.000 m final sob exaustão muscular máxima' },
+  { order: 16, key: 'WALLBALLS', name: 'Wall Balls', type: 'STATION', stationCode: 'WALLBALLS', reps: 100, description: '100 reps (9 kg no alvo 3 m)' },
+]
+
+export const RUN_FATIGUE_FACTORS: Record<number, number> = {
+  1: 1.00, // Corrida 1 (limpo)
+  2: 1.04, // Corrida 2 pós-Ski
+  3: 1.12, // Corrida 3 pós-Sled Push (pernas pesadas)
+  4: 1.07, // Corrida 4 pós-Sled Pull
+  5: 1.08, // Corrida 5 pós-BBJ
+  6: 1.06, // Corrida 6 pós-Rowing
+  7: 1.04, // Corrida 7 pós-Farmers
+  8: 1.15, // Corrida 8 pós-Sandbag Lunges (fadiga máxima)
+}
+
+export const DEFAULT_ROXZONE_SEC = 320 // 8 passagens x 40s
+
+export const STATION_NORMATIVE_SECONDS_OPEN_M: Record<StationCode, number> = {
+  RUN_1KM: 290,
+  SKIERG: 235,
+  SLED_PUSH: 165,
+  SLED_PULL: 220,
+  BBJ: 255,
+  ROWING: 240,
+  FARMERS: 120,
+  SANDBAG: 270,
+  WALLBALLS: 310,
+}
+

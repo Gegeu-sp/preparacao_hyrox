@@ -9,10 +9,11 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
 import { motion } from 'framer-motion'
 import { useTheme } from 'next-themes'
-import { Activity, Flag, Gauge, LayoutDashboard, CalendarDays, Sun, Moon, RefreshCw, TriangleAlert } from 'lucide-react'
+import { Activity, Flag, Gauge, LayoutDashboard, CalendarDays, Sun, Moon, RefreshCw, TriangleAlert, Timer } from 'lucide-react'
 import { DashboardTab, DashboardSkeleton } from '@/components/training/dashboard-tab'
 import { PlanTab } from '@/components/training/plan-tab'
 import { WeekTab } from '@/components/training/week-tab'
+import { PredictorTab } from '@/components/training/predictor-tab'
 import type { DashboardResponse, PlanResponse } from '@/lib/types'
 
 export default function Home() {
@@ -104,6 +105,9 @@ export default function Home() {
               <TabsTrigger value="diario" className="gap-1.5 text-xs sm:text-sm">
                 <Gauge className="size-3.5" /> Diário de Treino
               </TabsTrigger>
+              <TabsTrigger value="previsao" className="gap-1.5 text-xs sm:text-sm">
+                <Timer className="size-3.5" /> Previsão de Prova
+              </TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
@@ -144,6 +148,9 @@ export default function Home() {
               </TabsContent>
               <TabsContent value="diario" className="mt-0">
                 <WeekTab key="week" plan={plan} onDataChanged={() => void refresh(true)} jumpWeek={jumpWeek} />
+              </TabsContent>
+              <TabsContent value="previsao" className="mt-0">
+                <PredictorTab />
               </TabsContent>
             </Tabs>
           </motion.div>

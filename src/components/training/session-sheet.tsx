@@ -111,6 +111,7 @@ export function SessionSheet({ session, open, onOpenChange, onSaved }: {
     setSt((arr) => arr.map((s) => (s.id === id ? { ...s, [field]: value } : s)))
 
   async function save() {
+    if (!session) return
     setSaving(true)
     try {
       const payload: SessionPatchPayload = {

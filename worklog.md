@@ -109,3 +109,20 @@ Work Log:
 
 Stage Summary:
 - Projeto concluído e verificado; app disponível via Preview Panel.
+
+---
+Task ID: 9
+Agent: Antigravity (Speckit Workflow)
+Task: Módulo Preditivo de Tempo de Prova HYROX (Feature 001-hyrox-race-predictor)
+
+Work Log:
+- Implementado ciclo completo Spec Kit (constitution -> specify -> plan -> tasks -> implement).
+- Motor de cálculo fisiológico em `src/lib/predictions.ts` e `src/lib/predictions-calc.ts` considerando limiares VT1/VT2, VO2max e fatores de fadiga neuromuscular por estação (especialmente Sled Push e Sandbag Lunges).
+- Endpoints REST `/api/predictions` (GET) e `/api/predictions/simulate` (POST) para cálculo determinístico de cenários (Realista, Otimista, Conservador) e simulação "What-If".
+- Componentes de UI em `src/components/training/`: `predictor-cards.tsx`, `predictor-segments-table.tsx`, `predictor-simulator.tsx` e `predictor-tab.tsx`.
+- Aba "Previsão de Prova" integrada à navegação principal em `src/app/page.tsx`.
+- Validação completa: linter limpo (`eslint .`), checagem TypeScript (`tsc --noEmit`), e endpoints testados via requisições HTTP locais.
+
+Stage Summary:
+- Feature 001-hyrox-race-predictor implementada, testada e ativa na aplicação.
+

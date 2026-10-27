@@ -59,6 +59,19 @@ export function fmtPace(secPerKm: number | null | undefined): string {
   return `${fmtClock(secPerKm)}/km`
 }
 
+/** segundos → "hh:mm:ss" */
+export function fmtClockHms(sec: number | null | undefined): string {
+  if (sec == null || Number.isNaN(sec)) return '—'
+  const isNeg = sec < 0
+  const absSec = Math.abs(Math.round(sec))
+  const h = Math.floor(absSec / 3600)
+  const m = Math.floor((absSec % 3600) / 60)
+  const s = Math.round(absSec % 60)
+  const sign = isNeg ? '-' : ''
+  return `${sign}${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+}
+
+
 /** aceita "4:05", "4:05:30", "250" → segundos */
 export function parseClock(input: string): number | null {
   const v = input.trim()
