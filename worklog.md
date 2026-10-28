@@ -126,3 +126,22 @@ Work Log:
 Stage Summary:
 - Feature 001-hyrox-race-predictor implementada, testada e ativa na aplicação.
 
+---
+Task ID: 10
+Agent: Antigravity (Speckit Workflow)
+Task: Criação e Estruturação do README.md Profissional & Portfólio GitHub (Feature 002-profile-readme)
+
+Work Log:
+- Especificação, plano e tarefas documentados em `specs/002-profile-readme/` seguindo metodologia Spec Kit.
+- Estruturado `README.md` completo e moderno na raiz do repositório para o perfil principal do desenvolvedor (@Gegeu-sp).
+- Implementado cabeçalho de impacto com capsule-render SVG com gradiente dark esportivo e typing-svg dinâmico com alternância de stacks.
+- Elaborada seção biográfica destacando a formação em ADS (4º semestre, Universidade Anhembi Morumbi), background sólido como Personal Trainer, Strength Coach (CREF: 158814-G/SP) e supervisor no LPO System, unindo ciência do esporte com engenharia de software de alta performance.
+- Construída matriz de Tech Stack categorizada com badges oficiais Shields.io em estilo for-the-badge (Python, JS, TS, Java, React, Next.js, Tailwind, Node.js, Prisma, PostgreSQL, Supabase, MySQL, RabbitMQ, Docker, Linux/WSL, Git, VS Code, Cursor.ai, Trae IDE).
+- Desenvolvido showcase em tabela modular para os projetos de destaque: Nexus Core, WhatsApp Workout Management System, Aegis-Notifier e HYROX Control.
+- Configurados widgets analíticos em tempo real do GitHub Stats, Top Languages e Contribution Streak Stats para a conta `Gegeu-sp`.
+- Adicionado rodapé canônico com identificação profissional obrigatória e badges clicáveis para LinkedIn, GitHub, E-mail e Instagram.
+- Commit e upload (push) para o repositório remoto executados com sucesso.
+
+Stage Summary:
+- README.md profissional, moderno e de alto impacto publicado e sincronizado com o GitHub.
+
