@@ -1,11 +1,12 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { computeDashboard } from '@/lib/analytics'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const payload = await computeDashboard()
+    const athleteId = req.nextUrl.searchParams.get('athleteId') ?? undefined
+    const payload = await computeDashboard(athleteId)
     return NextResponse.json(payload)
   } catch (e) {
     console.error('[api/dashboard]', e)

@@ -5,6 +5,7 @@ import { computeRacePrediction, simulatePredictionScenario } from '@/lib/predict
 export const dynamic = 'force-dynamic'
 
 const simulateSchema = z.object({
+  athleteId: z.string().optional(),
   basePaceAdjustmentSec: z.number().min(-60).max(60).optional(),
   stationAdjustments: z.record(z.string(), z.number().min(-120).max(120)).optional(),
   roxzoneAdjustmentSec: z.number().min(-120).max(120).optional(),
@@ -25,7 +26,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Parâmetros de simulação inválidos', details: parsed.error.format() }, { status: 400 })
     }
 
-    const base = await computeRacePrediction()
+    const base = await computeRacePrediction(parsed.data.athleteId)
     if (!base) {
       return NextResponse.json({ error: 'Atleta não encontrado para simulação' }, { status: 404 })
     }

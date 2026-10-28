@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { toast } from 'sonner'
-import { Loader2, Save, ClipboardList, Dumbbell, Flag, NotebookPen } from 'lucide-react'
+import { Loader2, Save, ClipboardList, Dumbbell, Flag, NotebookPen, CheckCircle2 } from 'lucide-react'
 import { STATUS_META, SESSION_STATUS, RPE_SCALE_HINT } from '@/lib/constants'
 import { fmtDateFull, fmtClock, parseClock } from '@/lib/format'
 import { tonnageOf, tonnageOfActual } from '@/lib/tonnage'
@@ -109,6 +109,38 @@ export function SessionSheet({ session, open, onOpenChange, onSaved }: {
     setEx((arr) => arr.map((e) => (e.id === id ? { ...e, [field]: value } : e)))
   const setStField = (id: string, field: keyof StEdit, value: string) =>
     setSt((arr) => arr.map((s) => (s.id === id ? { ...s, [field]: value } : s)))
+
+  const fillActualsFromPrescribed = () => {
+    setDurA((prev) => (prev.trim() === '' ? durP : prev))
+    setKmA((prev) => (prev.trim() === '' ? kmP : prev))
+    setRpeA(rpeP)
+    setEx((arr) =>
+      arr.map((e) => ({
+        ...e,
+        setsA: e.setsA.trim() === '' ? e.setsP : e.setsA,
+        repsA: e.repsA.trim() === '' ? e.repsP : e.repsA,
+        loadA: e.loadA.trim() === '' ? e.loadP : e.loadA,
+      })),
+    )
+    setSt((arr) =>
+      arr.map((s) => ({
+        ...s,
+        actual: s.actual.trim() === '' ? s.target : s.actual,
+      })),
+    )
+  }
+
+  const handleStatusChange = (nextStatus: string) => {
+    setStatus(nextStatus)
+    if (nextStatus === 'CONCLUIDO' || nextStatus === 'PARCIAL' || nextStatus === 'AJUSTADO') {
+      fillActualsFromPrescribed()
+    } else if (nextStatus === 'PLANEJADO' || nextStatus === 'NAO_REALIZADO') {
+      setDurA('')
+      setKmA('')
+      setEx((arr) => arr.map((e) => ({ ...e, setsA: '', repsA: '', loadA: '' })))
+      setSt((arr) => arr.map((s) => ({ ...s, actual: '', hr: '' })))
+    }
+  }
 
   async function save() {
     if (!session) return
@@ -219,13 +251,28 @@ export function SessionSheet({ session, open, onOpenChange, onSaved }: {
 
             {/* ---------------- REALIZADO ---------------- */}
             <section className="space-y-3">
-              <h3 className="flex items-center gap-2 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                <NotebookPen className="size-4" /> Realizado
-              </h3>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h3 className="flex items-center gap-2 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                  <NotebookPen className="size-4" /> Realizado
+                </h3>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="h-7 gap-1.5 text-xs"
+                  onClick={() => {
+                    setStatus('CONCLUIDO')
+                    fillActualsFromPrescribed()
+                  }}
+                >
+                  <CheckCircle2 className="size-3.5 text-emerald-400" />
+                  Confirmar 100% como Prescrito
+                </Button>
+              </div>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 <div className="space-y-1">
                   <Label className="text-xs">Status</Label>
-                  <Select value={status} onValueChange={setStatus}>
+                  <Select value={status} onValueChange={handleStatusChange}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       {SESSION_STATUS.map((s) => (

@@ -6,12 +6,21 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
 import { RefreshCw, TriangleAlert, Info } from 'lucide-react'
 import { PredictorCards } from '@/components/training/predictor-cards'
+import { PredictorPeriodizationCurve } from '@/components/training/predictor-periodization-curve'
 import { PredictorSegmentsTable } from '@/components/training/predictor-segments-table'
 import { PredictorSimulator } from '@/components/training/predictor-simulator'
 import { simulatePredictionScenario } from '@/lib/predictions-calc'
 import type { RacePredictionDTO, PredictionScenarioInput } from '@/lib/types'
 
-export function PredictorTab() {
+export function PredictorTab({
+  athleteId,
+  refreshKey,
+  onGoToWeek,
+}: {
+  athleteId?: string
+  refreshKey?: number
+  onGoToWeek?: (weekId: string) => void
+}) {
   const [basePrediction, setBasePrediction] = useState<RacePredictionDTO | null>(null)
   const [activePrediction, setActivePrediction] = useState<RacePredictionDTO | null>(null)
   const [loading, setLoading] = useState(true)
@@ -20,8 +29,10 @@ export function PredictorTab() {
 
   const loadPrediction = useCallback(async (silent = false) => {
     if (silent) setRefreshing(true)
+    else setLoading(true)
     try {
-      const res = await fetch('/api/predictions', { cache: 'no-store' })
+      const qs = athleteId ? `?athleteId=${encodeURIComponent(athleteId)}` : ''
+      const res = await fetch(`/api/predictions${qs}`, { cache: 'no-store' })
       if (!res.ok) throw new Error('Não foi possível calcular a previsão de prova')
       const data: RacePredictionDTO = await res.json()
       setBasePrediction(data)
@@ -33,11 +44,11 @@ export function PredictorTab() {
       setLoading(false)
       setRefreshing(false)
     }
-  }, [])
+  }, [athleteId])
 
   useEffect(() => {
-    void loadPrediction()
-  }, [loadPrediction])
+    void loadPrediction(refreshKey !== undefined && refreshKey > 0)
+  }, [loadPrediction, refreshKey])
 
   const handleScenarioChange = (input: PredictionScenarioInput) => {
     if (!basePrediction) return
@@ -53,6 +64,7 @@ export function PredictorTab() {
           <Skeleton className="h-36 rounded-xl" />
           <Skeleton className="h-36 rounded-xl" />
         </div>
+        <Skeleton className="h-72 rounded-xl" />
         <Skeleton className="h-48 rounded-xl" />
         <Skeleton className="h-96 rounded-xl" />
       </div>
@@ -76,14 +88,17 @@ export function PredictorTab() {
 
   return (
     <div className="space-y-6">
-      {/* Cabeçalho do Subpainel */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-black tracking-tight text-foreground sm:text-xl">
-            Projeção e Estratégia de Prova HYROX
+            Projeção e Simulação Dinâmica da Periodização — {activePrediction.athleteName}
           </h2>
           <p className="text-xs text-muted-foreground">
-            Modelo determinístico combinando limiar VT2, VO₂max, histórico de simulações e fadiga por estação
+            Motor acoplado à execução real dos treinos ({activePrediction.progression.completedSessionsCount} sessões concluídas ·{' '}
+            <span className="font-semibold text-emerald-400">
+              {activePrediction.progression.gainAchievedFormatted}
+            </span>{' '}
+            conquistados desde a S1)
           </p>
         </div>
 
@@ -95,20 +110,23 @@ export function PredictorTab() {
           className="gap-1.5 text-xs"
         >
           <RefreshCw className={`size-3.5 ${refreshing ? 'animate-spin' : ''}`} />
-          Recalcular com Banco
+          Recalcular com Diário de Treino
         </Button>
       </div>
 
-      {/* Cards de Resumo Executivo (User Story 1 - MVP) */}
       <PredictorCards prediction={activePrediction} />
 
-      {/* Simulador Tático "What-If" (User Story 3) */}
+      <PredictorPeriodizationCurve
+        progression={activePrediction.progression}
+        weeklyCurve={activePrediction.weeklySimulationCurve}
+        onGoToWeek={onGoToWeek}
+      />
+
       <PredictorSimulator
         warnings={activePrediction.warnings}
         onChange={handleScenarioChange}
       />
 
-      {/* Tabela dos 16 Segmentos + Roxzone (User Story 2) */}
       <PredictorSegmentsTable
         segments={activePrediction.segments}
         roxzoneFormatted={activePrediction.roxzoneFormatted}
@@ -117,11 +135,10 @@ export function PredictorTab() {
         realisticTotalSec={activePrediction.realisticTotalSec}
       />
 
-      {/* Roda-pé Informativo Metodológico */}
       <div className="flex items-start gap-2 rounded-lg border bg-muted/20 p-3 text-xs text-muted-foreground">
         <Info className="size-4 shrink-0 text-primary mt-0.5" />
         <div>
-          <strong>Metodologia Esportiva</strong>: As corridas consideram o fator de decaimento por fadiga muscular acumulada. O Sled Push (152 kg) e os Sandbag Lunges (100 m) geram os maiores impactos nas corridas 3 e 8, respectivamente. O tempo de transição (Roxzone) projeta passagens médias em arena oficial.
+          <strong>Metodologia Esportiva Contínua</strong>: A previsão evolui automaticamente a cada treino marcado como Concluído, Parcial ou Ajustado no Diário de Treino. Sessões de Corrida calibram o pace base e o Fade Index; sessões de Força/Tonelagem reduzem os tempos de Sleds/Farmers/Lunges e protegem as corridas 3 e 8; sessões Híbridas atualizam diretamente os splits de estações e a Roxzone.
         </div>
       </div>
     </div>

@@ -167,3 +167,70 @@ Work Log:
 Stage Summary:
 - README.md do projeto HYROX CONTROL finalizado com excelência visual e científica; PROFILE_README.md arquivado para o perfil GitHub.
 
+---
+Task ID: 12
+Agent: Antigravity (Speckit Workflow)
+Task: Sistema Multi-Atleta Calibrado por Testes + Análise de Performance HYRESULT (Feature 003-multi-athlete-hyresult-analytics)
+
+Work Log:
+- Especificação, plano arquitetural, contratos de API/UI e lista de 19 tarefas documentados em `specs/003-multi-athlete-hyresult-analytics/`.
+- Modelagem Prisma expandida (`prisma/schema.prisma`):
+  - `Athlete` ampliado com divisão oficial (`OPEN_M`, `OPEN_F`, `PRO_M`, `PRO_F`), data de início do ciclo (`planStartDate`), e bateria diagnóstica completa (`vt1SpeedKmh`, `vt2SpeedKmh`, `squat3rmKg`, `deadlift3rmKg`, `bench3rmKg`, `cmjCm`, `skiErg1kTtSec`, `row500mTtSec`).
+  - Isolamento relacional `athleteId` (`onDelete: Cascade`) em `Mesocycle`, `Wellness` (`@@unique([athleteId, date])`) e novo modelo `HyresultRaceResult` (`LR3MS4JI5A0E80` + importações futuras).
+- Motor Gerador de Periodização Parametrizado (`src/lib/periodization-generator.ts`):
+  - Cálculo dinâmico das Zonas `Z1–Z5` (FC %FCmáx, FC Karvonen e Pace/km via `VT1`/`VT2`/`5km PB`).
+  - Escalonamento automático das cargas prescritas de Força/LPO pelo `3RM` de Agachamento, Levantamento Terra e Supino, volume semanal de corrida pela velocidade de limiar (`VT2`), e cargas/tempos-alvo das 8 estações HYROX pelas especificações oficiais da divisão (`DIVISION_STATION_SPECS`) + contrarrelógios de SkiErg 1000m e Remo 500m.
+  - Função `recalibrateFutureSessionsForAthlete()` que recalibra apenas sessões futuras (`PLANEJADO`) ao atualizar a bateria de testes, preservando 100% do histórico `CONCLUIDO`/`MODIFICADO`.
+- Motor Analítico HYRESULT (`src/lib/hyresult-analytics.ts`):
+  - Decomposição nos 3 Pilares Oficiais (`Total Running`, `Total Workouts`, `Total Roxzone`) com soma cronométrica exata (`Running + Workouts + Roxzone = Total Time`).
+  - Curvas normativas de percentil (`P1..P99`) por divisão oficial (`HYRESULT_DIVISION_BENCHMARKS`), gráfico Radar de 10 eixos (Ativo vs. Meta S28), análise de Run Splits (Runs 1–8) com `Fade Index (%)` e destaque de corridas comprometidas pós-Sled Push (`Run 3`) e pós-Lunges (`Run 8`), matriz de Roxzone (8 transições `RZ1–RZ8`), cálculo de `Time Savings Potential` e prescrição direta vinculada ao mesociclo atual.
+- Endpoints REST (`src/app/api/athletes`, `src/app/api/athletes/[id]`, `src/app/api/hyresult`, além de suporte a `?athleteId=` em `/api/plan`, `/api/dashboard`, `/api/wellness`, `/api/predictions` e `/api/predictions/simulate`).
+- Componentes visuais (`src/components/training/athlete-switcher-dialog.tsx`, `hyresult-tab.tsx`, `hyresult-radar-and-pillars.tsx`, `hyresult-splits-and-roxzone.tsx`) integrados ao cabeçalho global e à 5ª aba **"Análise HYRESULT"** em `src/app/page.tsx`.
+- Base populada com 2 atletas completos (Rafael Nogueira — `OPEN_M` com benchmark oficial `#LR3MS4JI5A0E80` e Helena Costa — `OPEN_F` com periodização calibrada para cargas femininas), `tsc --noEmit` e `eslint` com zero erros.
+
+Stage Summary:
+- Feature 003-multi-athlete-hyresult-analytics 100% implementada, validada e operacional.
+
+---
+Task ID: 13
+Agent: Antigravity (Speckit Workflow)
+Task: Simulação Preditiva Dinâmica Guiada pela Periodização & Evolução HYRESULT Treino a Treino (Feature 004-live-periodization-evolution)
+
+Work Log:
+- Ciclo Spec Kit completo (`specify`, `plan`, `tasks`, `implement`) documentado em `specs/004-live-periodization-evolution/`.
+- Motor Unificado de Simulação e Evolução Treino a Treino (`src/lib/live-evolution.ts`):
+  - Curva científica de adaptação das 28 semanas (`WEEKLY_ADAPTATION_PROGRESS`) modelando os 7 mesociclos (`DIAG`, `GPP1`, `GPP2`, `SPP1`, `SPP2`, `COMP`, `TAPER`) e os deloads (`S6`, `S11`, `S17`, `S22`).
+  - Processador cronológico sessão a sessão (`computeLivePeriodizationEvolution`) que percorre todos os treinos concluídos (`CONCLUIDO`, `PARCIAL`, `AJUSTADO`) de Corrida, Força/Tonelagem, Híbridos/Bricks, Testes e Regenerativos, atualizando `runSplits[0..7]`, `workSplits[8 estações]`, `roxSplits[0..7]` e fatores de fadiga das corridas comprometidas (`Run 3` pós-Sled Push e `Run 8` pós-Lunges).
+  - Geração dos snapshots `SessionEvolutionPointDTO[]`, da curva semanal `PeriodizationWeekSimulationPointDTO[]` (`S1..S28`) e do resumo `PeriodizationProgressionSummaryDTO` (`periodizationStatus`: `ADIANTADO` / `NO_ALVO` / `ATRASADO`).
+- Previsão de Prova Dinâmica (`src/lib/predictions.ts`, `src/components/training/predictor-periodization-curve.tsx`, `src/components/training/predictor-tab.tsx`):
+  - Acoplada ao estado vivo acumulado da periodização e enriquecida com os 4 marcos de progresso (`Diagnóstico S1` → `Estado Atual Simulado` → `Esperado na Semana Atual` → `Meta Final S28`) e gráfico interativo das 28 semanas (`ComposedChart` Recharts).
+- Análise HYRESULT Viva Treino a Treino (`src/lib/hyresult-analytics.ts`, `src/components/training/hyresult-evolution-timeline.tsx`, `src/components/training/hyresult-radar-and-pillars.tsx`, `src/components/training/hyresult-tab.tsx`):
+  - Nova fonte primária padrão `LIVE_EVOLUTION` (`"Evolução Atual — Treino a Treino (Ao Vivo)"`).
+  - Gráfico de evolução contínua do Tempo Total e Percentil na divisão por treino concluído, decomposição do ganho acumulado nos 3 Pilares e feed cronológico detalhando quantos segundos cada sessão economizou.
+  - Gráfico Radar de 10 Eixos expandido para 3 camadas (`Diagnóstico Inicial S1` vs. `Estado Ativo / Ao Vivo` vs. `Alvo Semana 28`).
+- Reatividade automática entre Diário de Treino, Previsão de Prova e Análise HYRESULT via `refreshVersion` em `src/app/page.tsx`, além de seed enriquecido com 6 sessões concluídas na Semana 1 (`FORCA`, `TESTE`, `CORRIDA`, `HIBRIDO` com splits realizados).
+- Validação `npx tsc --noEmit` e `npm run lint` aprovada com zero erros.
+
+Stage Summary:
+- Feature 004-live-periodization-evolution 100% implementada, validada e ativa em produção local.
+
+
+
+
+---
+Task ID: 14
+Agent: Main Agent (Speckit Specify + Plan + Tasks + Implement)
+Task: Feature `005-unified-periodization-sync` — Sincronização Unificada de Dados entre Abas, Zero Treinos Pré-Confirmados e Acompanhamento da Periodização no HYRESULT (`T001`–`T009`).
+
+Work Log:
+- **Zero Treinos Pré-Confirmados (`T002`)**: Atualizado `prisma/seed.ts` (`seedSampleActuals: false`, `0` registros de wellness automáticos) e re-executado o seed para que os atletas comecem com `0 / 196` sessões confirmadas (`100% PLANEJADO`).
+- **Sincronização 100% Unificada entre as 5 Abas (`T003`, `T004`, `T007`, `T008`)**:
+  - `src/lib/analytics.ts`: Corrigido `modalitySplit`, `weekSummary` e `computeDashboard` para contabilizar estritamente sessões com status confirmado (`CONCLUIDO`, `PARCIAL`, `AJUSTADO`), nunca tratando sessões `PLANEJADO` como executadas, e exposto `completedSessionsTotal` e `plannedSessionsTotal`.
+  - `src/app/api/sessions/[id]/route.ts`, `src/components/training/session-sheet.tsx` e `src/components/training/week-tab.tsx`: Adicionado preenchimento automático inteligente dos valores prescritos ao confirmar uma sessão (inclusive via botão de 1 clique **"Confirmar"** / **"Desmarcar"** no card do dia no Diário de Treino) e limpeza completa (`null`) ao reverter para `PLANEJADO`.
+  - `src/app/page.tsx` e `src/components/training/dashboard-tab.tsx`: Adicionado indicador global sincronizado (`X/196 treinos confirmados`) no topo da aplicação e no KPI de Aderência.
+- **HYRESULT Integrado à Periodização Completa S1 → S28 (`T001`, `T005`, `T006`)**:
+  - `src/lib/live-evolution.ts` e `src/lib/hyresult-analytics.ts`: Adicionada a curva das 28 semanas (`weeklySimulationCurve`) ao `HyresultAnalysisDTO` e incluídos todos os marcos das fases da periodização (`S6 — Fim do GPP1`, `S11 — Fim do GPP2`, `S17 — Fim do SPP1`, `S21 — Meia-Simulação SPP2`, `S24 — Simulação Completa #1 COMP`, `S26 — Simulação Completa #2 COMP`, `S28 — Alvo Final TAPER`) no seletor da aba **Análise HYRESULT**.
+  - `src/components/training/hyresult-tab.tsx` e `src/components/training/hyresult-evolution-timeline.tsx`: Integrado `<PredictorPeriodizationCurve />` dentro da aba **Análise HYRESULT** e adicionado banner explicativo quando `0` treinos foram confirmados, com atalho direto para confirmar o 1º treino na Semana 1.
+
+Stage Summary:
+- `npx tsx prisma/seed.ts`, `npx tsc --noEmit` e `npm run lint` executados com 0 erros.

@@ -29,12 +29,14 @@
 
 ## 📖 Visão Geral
 
-O **HYROX CONTROL** é uma plataforma analítica de engenharia de software e ciência do esporte desenvolvida especificamente para a **preparação física de alta performance para a prova HYROX** (alvo: 8 e 9 de Maio de 2027 — ciclo estruturado de 28 semanas para o atleta **Rafael Nogueira**).
+O **HYROX CONTROL** é uma plataforma analítica **Multi-Atleta** de engenharia de software e ciência do esporte desenvolvida especificamente para a **preparação física de alta performance para a prova HYROX** (ciclo estruturado de 28 semanas / 196 sessões calibradas individualmente para cada atleta e divisão oficial).
 
-A aplicação substitui planilhas estáticas por um ecossistema reativo moderno, integrando:
-1. **Monitoramento Biomecânico e de Carga Interna/Externa**: acompanhamento diário de volume ($km$), intensidade ($RPE$), tonelagem muscular acumulada ($\Sigma \text{séries} \times \text{reps} \times \text{carga}$) e carga de esforço ponderada ($sRPE$).
-2. **Modelagem Matemática de Fadiga e Prontidão**: cálculo contínuo de curvas de condicionamento físico (*Fitness* EWMA 42 dias) e estresse neuromuscular residual (*Fadiga* EWMA 7 dias) segundo o modelo Banister, além da razão de estresse agudo-crônico (*ACWR*).
-3. **Motor Preditivo Determinístico de Prova (HYROX Race Predictor)**: algoritmo calibrado pelos limiares ventilatórios reais do atleta ($VT_1$, $VT_2$, $VO_2\text{max}$ e $PB$ de $5\text{ km}$), projetando os 16 segmentos da prova (8x $1\text{ km}$ intercalados com as 8 estações funcionais e tempos de *Roxzone*) com simulador tático *What-If*.
+A aplicação substitui planilhas estáticas por um ecossistema reativo moderno, 100% interligado entre suas **5 abas principais (`Painel`, `Periodização`, `Diário de Treino`, `Previsão de Prova` e `Análise HYRESULT`)**, integrando:
+1. **Gestão Multi-Atleta com Geração Automática de Periodização (28 Semanas)**: cadastro e alternância instantânea de atletas (Open/Pro Masculino e Feminino), gerando automaticamente 7 mesociclos, 28 microciclos e 196 sessões calibradas pelos limiares fisiológicos individuais ($VT_1$, $VT_2$, $VO_2\text{max}$, $PB$ de $5\text{ km}$ e peso corporal).
+2. **Monitoramento Biomecânico e Sincronização Estrita de Treinos Confirmados**: todos os 196 treinos iniciam como `PLANEJADO` (`0 / 196` pré-confirmados). Ao confirmar qualquer sessão (inclusive com **1 clique** no Diário de Treino), todas as 5 abas recalculam simultaneamente volume ($km$), intensidade ($RPE$), tonelagem muscular ($\Sigma \text{séries} \times \text{reps} \times \text{carga}$) e carga interna ($sRPE$).
+3. **Modelagem Matemática de Fadiga e Prontidão**: cálculo contínuo de curvas de condicionamento físico (*Fitness* EWMA 42 dias) e estresse neuromuscular residual (*Fadiga* EWMA 7 dias) segundo o modelo Banister, além da razão de estresse agudo-crônico (*ACWR*).
+4. **Motor Preditivo Contínuo (`S1 → S28`)**: algoritmo que simula a evolução semana a semana ao longo das 28 semanas da periodização (**Planejado vs. Executado Real vs. Projeção Contínua**), decompondo os 16 segmentos da prova (8x $1\text{ km}$ + 8 estações + *Roxzone*) com simulador tático *What-If*.
+5. **Telemetria & Análise Padrão HYRESULT (`#LR3MS4JI5A0E80`)**: diagnóstico competitivo completo com **Radar de Percentis de 10 Eixos**, decomposição nos **3 Pilares (Running, Workouts e Roxzone)**, **Fade Index (Desaceleração)**, evolução **treino a treino** e comparação direta com os marcos das fases da periodização (`S6 GPP1`, `S11 GPP2`, `S17 SPP1`, `S21 SPP2`, `S24/S26 COMP` e `S28 TAPER`).
 
 ---
 
@@ -113,10 +115,19 @@ $$\text{Tempo Total} = \sum_{k=1}^{8} \text{Run}_k + \sum_{s=1}^{8} \text{Estaç
 - Registro diário de variáveis psicométricas em escala Likert (1 a 5): qualidade do sono, estresse, fadiga muscular, motivação e dores articulares.
 - Inserção de marcadores fisiológicos objetivos: frequência cardíaca de repouso ($FC_{\text{rep}}$), variabilidade da frequência cardíaca ($HRV$) e peso corporal.
 
-### 5. ⏱️ HYROX Race Predictor & Simulador "What-If"
+### 5. ⏱️ HYROX Race Predictor, Curva da Periodização (`S1 → S28`) & Simulador "What-If"
+- **Curva de Simulação da Periodização (28 Semanas):** gráfico interativo comparando a **Curva Planejada (`S1 → S28`)**, o **Tempo Simulado Real** (das semanas com treinos confirmados) e a **Projeção Contínua**, com cartões dos marcos de avaliação (`S1`, `S6`, `S11`, `S17`, `S21`, `S24`, `S26`, `S28`).
 - **Visão Macro de Prova:** projeção dos cenários Realista, Otimista e Conservador com cálculo de delta contra o objetivo cadastrado.
 - **Tabela dos 16 Segmentos:** paces projetados ($min/km$), tempo em cada estação funcional e bandeiras visuais automáticas para estações críticas (tempo $> 15\%$ acima da meta).
 - **Simulador Tático:** sliders interativos para ajuste em tempo real de pace de corrida, tempos de estações e transições na Roxzone, recalculando imediatamente a projeção final de tempo.
+
+### 6. 📈 Telemetria Competitiva & Evolução Treino a Treino (Análise HYRESULT)
+- **Radar de Percentis de 10 Eixos & 3 Pilares:** comparação contra a distribuição oficial da divisão do atleta (*Running*, *SkiErg*, *Sled Push*, *Sled Pull*, *Burpee Broad Jump*, *Rowing*, *Farmers Carry*, *Sandbag Lunges*, *Wall Balls* e *Roxzone*).
+- **Evolução Viva Treino a Treino:** gráfico e feed cronológico mostrando exatamente quantos segundos cada treino confirmado no Diário de Treino economizou nos 3 pilares (*Running*, *Workouts* e *Roxzone*) desde o Diagnóstico Inicial (`#0`).
+- **Marcos da Periodização & Importação HYRESULT:** seletor rápido para inspecionar a evolução atual ao vivo, resultados oficiais importados (ex.: `#LR3MS4JI5A0E80`) ou qualquer marco das fases da periodização (`GPP1` a `TAPER`), com recomendações automáticas vinculadas aos mesociclos.
+
+### 7. 👥 Gestão Multi-Atleta com Periodização Individualizada
+- **Seletor e Criador de Atletas no Topo:** alterne entre atletas cadastrados (ex.: *Rafael Nogueira — Open M* e *Helena Costa — Open F*) ou cadastre novos atletas informando divisão, peso, altura, FC máx/repouso, $VO_2\text{max}$, paces de $VT_1$/$VT_2$/$5\text{ km}$ e 1RMs, gerando instantaneamente as 28 semanas e 196 sessões calibradas.
 
 ---
 
@@ -141,34 +152,45 @@ $$\text{Tempo Total} = \sum_{k=1}^{8} \text{Run}_k + \sum_{s=1}^{8} \text{Estaç
 ```text
 preparacao_hyrox/
 ├── prisma/
-│   ├── schema.prisma              # Schema do banco de dados relacional (Athlete, Meso, Micro, Session, etc.)
-│   └── seed.ts                    # Script de população científica das 28 semanas e 196 sessões
+│   ├── schema.prisma                         # Schema relacional Multi-Atleta (Athlete, Meso, Micro, Session, HyroxResult, etc.)
+│   └── seed.ts                               # Seed multi-atleta (28 semanas / 196 sessões PLANEJADAS + Baseline #LR3MS4JI5A0E80)
 ├── db/
-│   └── custom.db                  # Banco de dados SQLite persistente
+│   └── custom.db                             # Banco de dados SQLite persistente
 ├── specs/
-│   ├── 001-hyrox-race-predictor/  # Spec Kit do módulo preditivo fisiológico
-│   └── 002-profile-readme/        # Documentação e histórico do portfólio
+│   ├── 001-hyrox-race-predictor/             # Spec Kit do módulo preditivo fisiológico
+│   ├── 002-profile-readme/                   # Documentação e histórico do portfólio
+│   ├── 003-multi-athlete-hyresult-analytics/ # Spec Kit Multi-Atleta & Telemetria HYRESULT
+│   ├── 004-live-periodization-evolution/     # Spec Kit Simulação Contínua S1->S28 & Evolução Treino a Treino
+│   └── 005-unified-periodization-sync/       # Spec Kit Sincronização Unificada nas 5 Abas & Zero Pré-Confirmados
 ├── src/
 │   ├── app/
-│   │   ├── api/                   # Rotas REST (/api/plan, /api/dashboard, /api/sessions, /api/predictions)
-│   │   ├── layout.tsx             # Shell da aplicação com temas e provedores
-│   │   └── page.tsx               # SPA central com abas (Painel, Periodização, Diário, Previsão)
+│   │   ├── api/                              # Rotas REST (/api/athletes, /api/plan, /api/dashboard, /api/sessions, /api/predictions, /api/hyresult)
+│   │   ├── layout.tsx                        # Shell da aplicação com temas e provedores
+│   │   └── page.tsx                          # SPA central com 5 abas sincronizadas e seletor multi-atleta
 │   ├── components/
-│   │   ├── training/              # Componentes de domínio esportivo
-│   │   │   ├── predictor-cards.tsx
-│   │   │   ├── predictor-segments-table.tsx
-│   │   │   ├── predictor-simulator.tsx
-│   │   │   ├── session-sheet.tsx
-│   │   │   ├── dashboard-tab.tsx
-│   │   │   └── charts.tsx
-│   │   └── ui/                    # Primitivas visuais do Design System (shadcn/ui)
+│   │   ├── training/                         # Componentes de domínio esportivo
+│   │   │   ├── athlete-switcher-dialog.tsx   # Seletor e modal de criação de atletas com calibração fisiológica
+│   │   │   ├── dashboard-tab.tsx             # Painel de KPIs, ACWR, Fitness-Fadiga e Wellness
+│   │   │   ├── plan-tab.tsx                  # Visão dos 7 Mesociclos e 28 Microciclos
+│   │   │   ├── week-tab.tsx                  # Diário de Treino com confirmação rápida de 1 clique
+│   │   │   ├── session-sheet.tsx             # Editor completo de sessão (Prescrito vs Realizado)
+│   │   │   ├── predictor-tab.tsx             # Previsão de Prova acoplada à Periodização
+│   │   │   ├── predictor-periodization-curve.tsx # Curva S1->S28 (Planejado vs Executado vs Projetado)
+│   │   │   ├── hyresult-tab.tsx              # Telemetria HYRESULT com marcos da periodização
+│   │   │   ├── hyresult-radar-and-pillars.tsx# Radar 10 Eixos, 3 Pilares e Ranking de Percentis
+│   │   │   ├── hyresult-evolution-timeline.tsx # Série histórica e feed de impacto treino a treino
+│   │   │   └── hyresult-splits-and-roxzone.tsx # Pacing, Fade Index, Raio-X Roxzone e Prescrições
+│   │   └── ui/                               # Primitivas visuais do Design System (shadcn/ui)
 │   └── lib/
-│       ├── analytics.ts           # Motor de cálculo Foster, EWMA 42:7, ACWR e tonelagem
-│       ├── predictions.ts         # Motor de predição fisiológica e cenários HYROX
-│       ├── predictions-calc.ts    # Funções puras de cálculo de splits e fadiga
-│       └── constants.ts           # Constantes e validações de domínio
-├── worklog.md                     # Registro cronológico detalhado de desenvolvimento
-└── package.json                   # Dependências e scripts do projeto
+│       ├── analytics.ts                      # Motor de cálculo Foster, EWMA 42:7, ACWR e tonelagem estrita
+│       ├── periodization-generator.ts        # Gerador determinístico de 28 semanas / 196 sessões por atleta
+│       ├── live-evolution.ts                 # Motor de simulação contínua por sessão e por semana (S1->S28)
+│       ├── hyresult-analytics.ts             # Motor de telemetria HYRESULT, percentis e prescrições
+│       ├── predictions.ts                    # Motor de predição fisiológica e cenários HYROX
+│       ├── predictions-calc.ts               # Funções puras de cálculo de splits e fadiga
+│       └── constants.ts                      # Constantes, benchmarks por divisão e validações
+├── worklog.md                                # Registro cronológico detalhado de desenvolvimento
+└── package.json                              # Dependências e scripts do projeto
 ```
 
 ---

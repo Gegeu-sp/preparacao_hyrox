@@ -1,6 +1,6 @@
 'use client'
 
-// Registro diário de bem-estar (questionário tipo Hooper-Mackinnon simplificado)
+// Registro diário de bem-estar (questionário tipo Hooper-Mackinnon simplificado) — Multi-Atleta
 import { useEffect, useState } from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -20,9 +20,10 @@ const SCALES: { key: keyof WellnessDTO; label: string; low: string; high: string
   { key: 'motivation', label: 'Motivação', low: 'baixa', high: 'máxima', dft: 4 },
 ]
 
-export function WellnessDialog({ open, onOpenChange, initial, onSaved }: {
+export function WellnessDialog({ open, onOpenChange, athleteId, initial, onSaved }: {
   open: boolean
   onOpenChange: (o: boolean) => void
+  athleteId?: string
   initial: WellnessDTO | null
   onSaved: () => void
 }) {
@@ -54,6 +55,7 @@ export function WellnessDialog({ open, onOpenChange, initial, onSaved }: {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          athleteId,
           date: initial?.date,
           sleepHours: sleepHours || null,
           sleepQuality: scales.sleepQuality,
@@ -123,7 +125,7 @@ export function WellnessDialog({ open, onOpenChange, initial, onSaved }: {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="wt">Peso corporal (kg)</Label>
-              <Input id="wt" type="number" step="0.1" min="50" max="120" value={weightKg} onChange={(e) => setWeightKg(e.target.value)} placeholder="76,0" />
+              <Input id="wt" type="number" step="0.1" min="35" max="160" value={weightKg} onChange={(e) => setWeightKg(e.target.value)} placeholder="76,0" />
             </div>
           </div>
 

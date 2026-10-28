@@ -1,5 +1,6 @@
 // Domínio compartilhado: tipos de sessão, fases, estações, zonas, status
 // (SQLite não suporta enums Prisma → strings validadas aqui)
+import type { HyroxDivision } from '@/lib/types'
 
 export const SESSION_TYPES = ['FORCA', 'CORRIDA', 'LPO', 'PLIOMETRIA', 'HIBRIDO', 'TESTE', 'ATIVACAO', 'REGEN'] as const
 export type SessionType = (typeof SESSION_TYPES)[number]
@@ -15,6 +16,15 @@ export type WeekType = (typeof WEEK_TYPES)[number]
 
 export const STATION_CODES = ['RUN_1KM', 'SKIERG', 'SLED_PUSH', 'SLED_PULL', 'BBJ', 'ROWING', 'FARMERS', 'SANDBAG', 'WALLBALLS'] as const
 export type StationCode = (typeof STATION_CODES)[number]
+
+export const HYROX_DIVISIONS = ['OPEN_M', 'OPEN_F', 'PRO_M', 'PRO_F'] as const
+
+export const DIVISION_META: Record<HyroxDivision, { label: string; short: string; defaultGoalSec: number }> = {
+  OPEN_M: { label: 'Open Masculino', short: 'Open M', defaultGoalSec: 4500 },
+  OPEN_F: { label: 'Open Feminino', short: 'Open F', defaultGoalSec: 4920 },
+  PRO_M: { label: 'Pro Masculino', short: 'Pro M', defaultGoalSec: 4320 },
+  PRO_F: { label: 'Pro Feminino', short: 'Pro F', defaultGoalSec: 4680 },
+}
 
 export const WEEKDAYS = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'] as const
 export const WEEKDAYS_SHORT = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'] as const
@@ -61,16 +71,200 @@ export const WEEK_TYPE_META: Record<WeekType, { label: string; classes: string }
 export const STATION_META: Record<StationCode, { label: string; detail: string }> = {
   RUN_1KM: { label: 'Corrida 1 km', detail: '1.000 m entre estações (8×)' },
   SKIERG: { label: 'SkiErg', detail: '1.000 m' },
-  SLED_PUSH: { label: 'Sled Push', detail: '2 × 25 m (carga Open M)' },
-  SLED_PULL: { label: 'Sled Pull', detail: '2 × 25 m (carga Open M)' },
+  SLED_PUSH: { label: 'Sled Push', detail: '2 × 25 m (carga oficial da divisão)' },
+  SLED_PULL: { label: 'Sled Pull', detail: '2 × 25 m (carga oficial da divisão)' },
   BBJ: { label: 'Burpee Broad Jumps', detail: '80 m' },
   ROWING: { label: 'Rowing', detail: '1.000 m' },
   FARMERS: { label: "Farmer's Carry", detail: '2 × 100 m' },
-  SANDBAG: { label: 'Sandbag Lunges', detail: '100 m (20 kg Open M)' },
-  WALLBALLS: { label: 'Wall Balls', detail: '100 reps (9 kg Open M)' },
+  SANDBAG: { label: 'Sandbag Lunges', detail: '100 m' },
+  WALLBALLS: { label: 'Wall Balls', detail: '100 reps' },
 }
 
-// ---------- Zonas de treinamento (calibradas no teste incremental de 27/out) ----------
+// ---------- Pesos Oficiais por Divisão (Livro de Regras HYROX) ----------
+
+export interface DivisionStationSpec {
+  sledPushKg: number
+  sledPullKg: number
+  farmersEachKg: number
+  farmersTotalKg: number
+  sandbagKg: number
+  wallBallKg: number
+  wallBallTargetM: number
+  stationLoadDesc: Record<StationCode, string>
+}
+
+export const DIVISION_STATION_SPECS: Record<HyroxDivision, DivisionStationSpec> = {
+  OPEN_M: {
+    sledPushKg: 152,
+    sledPullKg: 103,
+    farmersEachKg: 24,
+    farmersTotalKg: 48,
+    sandbagKg: 20,
+    wallBallKg: 6,
+    wallBallTargetM: 3.0,
+    stationLoadDesc: {
+      RUN_1KM: '1.000 m',
+      SKIERG: '1.000 m (ergômetro)',
+      SLED_PUSH: '50 m · 152 kg (Open M)',
+      SLED_PULL: '50 m · 103 kg (Open M)',
+      BBJ: '80 m (peso corporal)',
+      ROWING: '1.000 m (ergômetro)',
+      FARMERS: '200 m · 2 × 24 kg (Open M)',
+      SANDBAG: '100 m · 20 kg (Open M)',
+      WALLBALLS: '100 reps · 6 kg @ 3,0 m (Open M)',
+    },
+  },
+  OPEN_F: {
+    sledPushKg: 102,
+    sledPullKg: 78,
+    farmersEachKg: 16,
+    farmersTotalKg: 32,
+    sandbagKg: 10,
+    wallBallKg: 4,
+    wallBallTargetM: 2.7,
+    stationLoadDesc: {
+      RUN_1KM: '1.000 m',
+      SKIERG: '1.000 m (ergômetro)',
+      SLED_PUSH: '50 m · 102 kg (Open F)',
+      SLED_PULL: '50 m · 78 kg (Open F)',
+      BBJ: '80 m (peso corporal)',
+      ROWING: '1.000 m (ergômetro)',
+      FARMERS: '200 m · 2 × 16 kg (Open F)',
+      SANDBAG: '100 m · 10 kg (Open F)',
+      WALLBALLS: '100 reps · 4 kg @ 2,7 m (Open F)',
+    },
+  },
+  PRO_M: {
+    sledPushKg: 202,
+    sledPullKg: 153,
+    farmersEachKg: 32,
+    farmersTotalKg: 64,
+    sandbagKg: 30,
+    wallBallKg: 9,
+    wallBallTargetM: 3.0,
+    stationLoadDesc: {
+      RUN_1KM: '1.000 m',
+      SKIERG: '1.000 m (ergômetro)',
+      SLED_PUSH: '50 m · 202 kg (Pro M)',
+      SLED_PULL: '50 m · 153 kg (Pro M)',
+      BBJ: '80 m (peso corporal)',
+      ROWING: '1.000 m (ergômetro)',
+      FARMERS: '200 m · 2 × 32 kg (Pro M)',
+      SANDBAG: '100 m · 30 kg (Pro M)',
+      WALLBALLS: '100 reps · 9 kg @ 3,0 m (Pro M)',
+    },
+  },
+  PRO_F: {
+    sledPushKg: 152,
+    sledPullKg: 103,
+    farmersEachKg: 24,
+    farmersTotalKg: 48,
+    sandbagKg: 20,
+    wallBallKg: 6,
+    wallBallTargetM: 2.7,
+    stationLoadDesc: {
+      RUN_1KM: '1.000 m',
+      SKIERG: '1.000 m (ergômetro)',
+      SLED_PUSH: '50 m · 152 kg (Pro F)',
+      SLED_PULL: '50 m · 103 kg (Pro F)',
+      BBJ: '80 m (peso corporal)',
+      ROWING: '1.000 m (ergômetro)',
+      FARMERS: '200 m · 2 × 24 kg (Pro F)',
+      SANDBAG: '100 m · 20 kg (Pro F)',
+      WALLBALLS: '100 reps · 6 kg @ 2,7 m (Pro F)',
+    },
+  },
+}
+
+// ---------- Benchmarks Normativos e Curvas de Percentis HYRESULT por Divisão ----------
+
+export interface NormativeCurve {
+  top10Sec: number // P90 (Top 10%)
+  medianSec: number // P50 (Mediana)
+  bottom20Sec: number // P20 (Base)
+}
+
+export const HYRESULT_DIVISION_BENCHMARKS: Record<
+  HyroxDivision,
+  {
+    totalTime: NormativeCurve
+    totalRun: NormativeCurve
+    totalWorkouts: NormativeCurve
+    totalRoxzone: NormativeCurve
+    stations: Record<StationCode, NormativeCurve>
+  }
+> = {
+  OPEN_M: {
+    totalTime: { top10Sec: 4080, medianSec: 4860, bottom20Sec: 5700 },
+    totalRun: { top10Sec: 2040, medianSec: 2480, bottom20Sec: 2960 },
+    totalWorkouts: { top10Sec: 1740, medianSec: 2020, bottom20Sec: 2340 },
+    totalRoxzone: { top10Sec: 260, medianSec: 360, bottom20Sec: 480 },
+    stations: {
+      RUN_1KM: { top10Sec: 255, medianSec: 310, bottom20Sec: 370 },
+      SKIERG: { top10Sec: 218, medianSec: 250, bottom20Sec: 285 },
+      SLED_PUSH: { top10Sec: 135, medianSec: 175, bottom20Sec: 230 },
+      SLED_PULL: { top10Sec: 195, medianSec: 245, bottom20Sec: 310 },
+      BBJ: { top10Sec: 215, medianSec: 270, bottom20Sec: 345 },
+      ROWING: { top10Sec: 222, medianSec: 255, bottom20Sec: 295 },
+      FARMERS: { top10Sec: 102, medianSec: 130, bottom20Sec: 168 },
+      SANDBAG: { top10Sec: 225, medianSec: 285, bottom20Sec: 360 },
+      WALLBALLS: { top10Sec: 245, medianSec: 325, bottom20Sec: 420 },
+    },
+  },
+  OPEN_F: {
+    totalTime: { top10Sec: 4380, medianSec: 5220, bottom20Sec: 6120 },
+    totalRun: { top10Sec: 2240, medianSec: 2720, bottom20Sec: 3200 },
+    totalWorkouts: { top10Sec: 1860, medianSec: 2120, bottom20Sec: 2440 },
+    totalRoxzone: { top10Sec: 280, medianSec: 380, bottom20Sec: 500 },
+    stations: {
+      RUN_1KM: { top10Sec: 280, medianSec: 340, bottom20Sec: 400 },
+      SKIERG: { top10Sec: 245, medianSec: 280, bottom20Sec: 320 },
+      SLED_PUSH: { top10Sec: 145, medianSec: 188, bottom20Sec: 245 },
+      SLED_PULL: { top10Sec: 210, medianSec: 265, bottom20Sec: 335 },
+      BBJ: { top10Sec: 240, medianSec: 300, bottom20Sec: 380 },
+      ROWING: { top10Sec: 250, medianSec: 288, bottom20Sec: 330 },
+      FARMERS: { top10Sec: 112, medianSec: 142, bottom20Sec: 182 },
+      SANDBAG: { top10Sec: 235, medianSec: 295, bottom20Sec: 375 },
+      WALLBALLS: { top10Sec: 255, medianSec: 335, bottom20Sec: 430 },
+    },
+  },
+  PRO_M: {
+    totalTime: { top10Sec: 3900, medianSec: 4620, bottom20Sec: 5400 },
+    totalRun: { top10Sec: 1920, medianSec: 2320, bottom20Sec: 2760 },
+    totalWorkouts: { top10Sec: 1720, medianSec: 1980, bottom20Sec: 2300 },
+    totalRoxzone: { top10Sec: 240, medianSec: 320, bottom20Sec: 430 },
+    stations: {
+      RUN_1KM: { top10Sec: 240, medianSec: 290, bottom20Sec: 345 },
+      SKIERG: { top10Sec: 208, medianSec: 236, bottom20Sec: 268 },
+      SLED_PUSH: { top10Sec: 150, medianSec: 195, bottom20Sec: 260 },
+      SLED_PULL: { top10Sec: 215, medianSec: 270, bottom20Sec: 345 },
+      BBJ: { top10Sec: 205, medianSec: 255, bottom20Sec: 320 },
+      ROWING: { top10Sec: 212, medianSec: 242, bottom20Sec: 275 },
+      FARMERS: { top10Sec: 110, medianSec: 142, bottom20Sec: 185 },
+      SANDBAG: { top10Sec: 240, medianSec: 305, bottom20Sec: 385 },
+      WALLBALLS: { top10Sec: 260, medianSec: 340, bottom20Sec: 435 },
+    },
+  },
+  PRO_F: {
+    totalTime: { top10Sec: 4260, medianSec: 5040, bottom20Sec: 5880 },
+    totalRun: { top10Sec: 2120, medianSec: 2560, bottom20Sec: 3020 },
+    totalWorkouts: { top10Sec: 1880, medianSec: 2140, bottom20Sec: 2460 },
+    totalRoxzone: { top10Sec: 260, medianSec: 340, bottom20Sec: 450 },
+    stations: {
+      RUN_1KM: { top10Sec: 265, medianSec: 320, bottom20Sec: 378 },
+      SKIERG: { top10Sec: 235, medianSec: 268, bottom20Sec: 305 },
+      SLED_PUSH: { top10Sec: 165, medianSec: 215, bottom20Sec: 280 },
+      SLED_PULL: { top10Sec: 230, medianSec: 290, bottom20Sec: 365 },
+      BBJ: { top10Sec: 225, medianSec: 280, bottom20Sec: 355 },
+      ROWING: { top10Sec: 240, medianSec: 274, bottom20Sec: 312 },
+      FARMERS: { top10Sec: 120, medianSec: 155, bottom20Sec: 198 },
+      SANDBAG: { top10Sec: 255, medianSec: 320, bottom20Sec: 405 },
+      WALLBALLS: { top10Sec: 275, medianSec: 355, bottom20Sec: 450 },
+    },
+  },
+}
+
+// ---------- Zonas de treinamento padrão (fallback) ----------
 
 export interface ZoneDef {
   zone: string
@@ -95,7 +289,7 @@ export const TEST_BATTERY = [
   { week: 17, label: 'Re-teste limiar', items: 'Teste curto em esteira (3 min × 3 stages) — recalibrar zonas pós-SPP1' },
   { week: 24, label: 'Simulação completa #1', items: 'Hyrox integral em ritmo de prova — raio-X logístico e de splits' },
   { week: 26, label: 'Simulação completa #2', items: 'Ensaio geral final (14 dias antes da prova)' },
-  { week: 28, label: 'PROVA — HYROX', items: '8–9 de maio de 2027 — confirmar wave/dia exato' },
+  { week: 28, label: 'PROVA — HYROX', items: 'Data alvo do atleta — confirmar wave/dia exato' },
 ]
 
 export const RPE_SCALE_HINT: Record<number, string> = {
@@ -128,19 +322,19 @@ export const HYROX_OFFICIAL_SEGMENTS: OfficialSegmentDef[] = [
   { order: 1, key: 'RUN_1', name: 'Corrida 1', type: 'RUN', stationCode: 'RUN_1KM', distanceM: 1000, description: '1.000 m inicial em ritmo controlado' },
   { order: 2, key: 'SKIERG', name: 'SkiErg', type: 'STATION', stationCode: 'SKIERG', distanceM: 1000, description: '1.000 m ergômetro de membros superiores' },
   { order: 3, key: 'RUN_2', name: 'Corrida 2', type: 'RUN', stationCode: 'RUN_1KM', distanceM: 1000, description: '1.000 m pós-SkiErg' },
-  { order: 4, key: 'SLED_PUSH', name: 'Sled Push', type: 'STATION', stationCode: 'SLED_PUSH', distanceM: 50, description: '2 × 25 m (152 kg Open M)' },
+  { order: 4, key: 'SLED_PUSH', name: 'Sled Push', type: 'STATION', stationCode: 'SLED_PUSH', distanceM: 50, description: '2 × 25 m (carga oficial)' },
   { order: 5, key: 'RUN_3', name: 'Corrida 3', type: 'RUN', stationCode: 'RUN_1KM', distanceM: 1000, description: '1.000 m com queima intensa de quadríceps' },
-  { order: 6, key: 'SLED_PULL', name: 'Sled Pull', type: 'STATION', stationCode: 'SLED_PULL', distanceM: 50, description: '2 × 25 m (103 kg Open M)' },
+  { order: 6, key: 'SLED_PULL', name: 'Sled Pull', type: 'STATION', stationCode: 'SLED_PULL', distanceM: 50, description: '2 × 25 m (carga oficial)' },
   { order: 7, key: 'RUN_4', name: 'Corrida 4', type: 'RUN', stationCode: 'RUN_1KM', distanceM: 1000, description: '1.000 m pós-Sled Pull' },
   { order: 8, key: 'BBJ', name: 'Burpee Broad Jumps', type: 'STATION', stationCode: 'BBJ', distanceM: 80, description: '80 m saltos horizontais' },
   { order: 9, key: 'RUN_5', name: 'Corrida 5', type: 'RUN', stationCode: 'RUN_1KM', distanceM: 1000, description: '1.000 m com estresse cardiovascular' },
   { order: 10, key: 'ROWING', name: 'Rowing', type: 'STATION', stationCode: 'ROWING', distanceM: 1000, description: '1.000 m remo ergômetro' },
   { order: 11, key: 'RUN_6', name: 'Corrida 6', type: 'RUN', stationCode: 'RUN_1KM', distanceM: 1000, description: '1.000 m pós-Remo' },
-  { order: 12, key: 'FARMERS', name: "Farmer's Carry", type: 'STATION', stationCode: 'FARMERS', distanceM: 200, description: '200 m (2 × 24 kg)' },
+  { order: 12, key: 'FARMERS', name: "Farmer's Carry", type: 'STATION', stationCode: 'FARMERS', distanceM: 200, description: '200 m (carga oficial)' },
   { order: 13, key: 'RUN_7', name: 'Corrida 7', type: 'RUN', stationCode: 'RUN_1KM', distanceM: 1000, description: '1.000 m antepenúltimo trecho' },
-  { order: 14, key: 'SANDBAG', name: 'Sandbag Lunges', type: 'STATION', stationCode: 'SANDBAG', distanceM: 100, description: '100 m passadas (20 kg Open M)' },
+  { order: 14, key: 'SANDBAG', name: 'Sandbag Lunges', type: 'STATION', stationCode: 'SANDBAG', distanceM: 100, description: '100 m passadas (carga oficial)' },
   { order: 15, key: 'RUN_8', name: 'Corrida 8', type: 'RUN', stationCode: 'RUN_1KM', distanceM: 1000, description: '1.000 m final sob exaustão muscular máxima' },
-  { order: 16, key: 'WALLBALLS', name: 'Wall Balls', type: 'STATION', stationCode: 'WALLBALLS', reps: 100, description: '100 reps (9 kg no alvo 3 m)' },
+  { order: 16, key: 'WALLBALLS', name: 'Wall Balls', type: 'STATION', stationCode: 'WALLBALLS', reps: 100, description: '100 reps (carga e alvo oficiais)' },
 ]
 
 export const RUN_FATIGUE_FACTORS: Record<number, number> = {
@@ -167,4 +361,3 @@ export const STATION_NORMATIVE_SECONDS_OPEN_M: Record<StationCode, number> = {
   SANDBAG: 270,
   WALLBALLS: 310,
 }
-

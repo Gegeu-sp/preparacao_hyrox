@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from 'sonner'
-import { ChevronLeft, ChevronRight, PencilLine, Timer, MapPin, Dumbbell, Gauge } from 'lucide-react'
+import { ChevronLeft, ChevronRight, PencilLine, Timer, MapPin, Dumbbell, Gauge, CheckCircle2, RotateCcw, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { WEEKDAYS, WEEKDAYS_SHORT, WEEK_TYPE_META } from '@/lib/constants'
 import { fmtDateShort, fmtTon, fmtKm } from '@/lib/format'
@@ -27,6 +27,7 @@ export function WeekTab({ plan, onDataChanged, jumpWeek }: {
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState<SessionDTO | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [togglingId, setTogglingId] = useState<string | null>(null)
 
   useEffect(() => {
     if (jumpWeek) setWeekId(jumpWeek.id)
@@ -67,6 +68,37 @@ export function WeekTab({ plan, onDataChanged, jumpWeek }: {
     }
     setSelected(updated)
     onDataChanged() // atualiza dashboard/plano global
+  }
+
+  const toggleConfirmSession = async (s: SessionDTO) => {
+    const isDone = s.status === 'CONCLUIDO' || s.status === 'PARCIAL' || s.status === 'AJUSTADO'
+    const nextStatus = isDone ? 'PLANEJADO' : 'CONCLUIDO'
+    setTogglingId(s.id)
+    try {
+      const res = await fetch(`/api/sessions/${s.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: nextStatus }),
+      })
+      if (!res.ok) throw new Error()
+      const updated: SessionDTO = await res.json()
+      if (detail) {
+        setDetail({
+          ...detail,
+          sessions: detail.sessions.map((item) => (item.id === updated.id ? updated : item)),
+        })
+      }
+      toast.success(
+        nextStatus === 'CONCLUIDO'
+          ? `Treino confirmado — ${WEEKDAYS[s.dayIndex - 1]} (${s.title}) sincronizado em todas as abas!`
+          : `Treino revertido para Planejado — ${WEEKDAYS[s.dayIndex - 1]}.`,
+      )
+      onDataChanged()
+    } catch {
+      toast.error('Não foi possível atualizar o status do treino.')
+    } finally {
+      setTogglingId(null)
+    }
   }
 
   return (
@@ -187,13 +219,42 @@ export function WeekTab({ plan, onDataChanged, jumpWeek }: {
                     <span className="flex items-center gap-1"><Gauge className="size-3" /> RPE {s.rpeActual ?? '–'}/{s.rpePrescribed}</span>
                   )}
                 </div>
-                <Button
-                  variant="outline" size="sm" className="w-full"
-                  onClick={() => { setSelected(s); setSheetOpen(true) }}
-                >
-                  <PencilLine className="size-3.5" />
-                  {s.status === 'PLANEJADO' ? 'Registrar / Editar' : 'Editar sessão'}
-                </Button>
+                <div className="mt-1 grid grid-cols-2 gap-1.5">
+                  <Button
+                    variant={
+                      s.status === 'CONCLUIDO' || s.status === 'PARCIAL' || s.status === 'AJUSTADO'
+                        ? 'secondary'
+                        : 'default'
+                    }
+                    size="sm"
+                    className="w-full text-xs"
+                    disabled={togglingId === s.id}
+                    onClick={() => void toggleConfirmSession(s)}
+                  >
+                    {togglingId === s.id ? (
+                      <Loader2 className="size-3.5 animate-spin" />
+                    ) : s.status === 'CONCLUIDO' || s.status === 'PARCIAL' || s.status === 'AJUSTADO' ? (
+                      <RotateCcw className="size-3.5" />
+                    ) : (
+                      <CheckCircle2 className="size-3.5" />
+                    )}
+                    {s.status === 'CONCLUIDO' || s.status === 'PARCIAL' || s.status === 'AJUSTADO'
+                      ? 'Desmarcar'
+                      : 'Confirmar'}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full text-xs"
+                    onClick={() => {
+                      setSelected(s)
+                      setSheetOpen(true)
+                    }}
+                  >
+                    <PencilLine className="size-3.5" />
+                    Detalhes
+                  </Button>
+                </div>
               </Card>
             )
           })}

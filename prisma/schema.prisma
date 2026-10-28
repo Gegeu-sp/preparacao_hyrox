@@ -1,5 +1,5 @@
 // HYROX CONTROL — Prisma Schema
-// Painel de controle de treinamento (prescrito vs. realizado) — Rafael Nogueira
+// Painel de controle de treinamento multi-atleta (prescrito vs. realizado + análise HYRESULT)
 // SQLite: enums não são suportados → campos String validados na aplicação (src/lib/constants.ts)
 
 generator client {
@@ -12,29 +12,44 @@ datasource db {
 }
 
 model Athlete {
-  id           String   @id @default(cuid())
-  name         String
-  birthDate    DateTime
-  heightCm     Float
-  weightKg     Float
-  bodyFatPct   Float
-  raceName     String
-  raceDate     DateTime
-  restingHr    Int?
-  maxHr        Int?
-  vo2max       Float? // mL/kg/min — teste incremental
-  vdot         Float?
-  vt1SpeedKmh  Float? // limiar aeróbico (VT1) km/h
-  vt2SpeedKmh  Float? // limiar anaeróbico (VT2) km/h
-  fiveKmPbSec  Int? // PB 5 km em segundos
-  goalRaceTime Int? // objetivo de prova em segundos
-  notes        String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id              String               @id @default(cuid())
+  name            String
+  gender          String               @default("M") // "M" | "F"
+  division        String               @default("OPEN_M") // "OPEN_M" | "OPEN_F" | "PRO_M" | "PRO_F"
+  ageGroup        String               @default("20-24") // ex.: "16-24" | "25-29" | "30-34" | "35-39" | "40-44"
+  birthDate       DateTime
+  heightCm        Float
+  weightKg        Float
+  bodyFatPct      Float
+  raceName        String
+  raceDate        DateTime
+  planStartDate   DateTime             @default(now())
+  restingHr       Int?
+  maxHr           Int?
+  vo2max          Float? // mL/kg/min — teste incremental
+  vdot            Float?
+  vt1SpeedKmh     Float? // limiar aeróbico (VT1) km/h
+  vt2SpeedKmh     Float? // limiar anaeróbico (VT2) km/h
+  fiveKmPbSec     Int? // PB 5 km em segundos
+  squat3rmKg      Float? // Teste 3RM Agachamento Livre (kg)
+  deadlift3rmKg   Float? // Teste 3RM Levantamento Terra (kg)
+  bench3rmKg      Float? // Teste 3RM Supino Reto (kg)
+  cmjCm           Float? // Countermovement Jump (cm)
+  skiErg1kTtSec   Int? // Time Trial 1.000m SkiErg (segundos)
+  row500mTtSec    Int? // Time Trial 500m Remo (segundos)
+  goalRaceTime    Int? // objetivo de prova em segundos
+  notes           String?
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  mesocycles      Mesocycle[]
+  wellnessRecords Wellness[]
+  hyresultResults HyresultRaceResult[]
 }
 
 model Mesocycle {
   id             String       @id @default(cuid())
+  athleteId      String
+  athlete        Athlete      @relation(fields: [athleteId], references: [id], onDelete: Cascade)
   code           String // DIAG | GPP1 | GPP2 | SPP1 | SPP2 | COMP | TAPER
   name           String
   order          Int
@@ -49,65 +64,65 @@ model Mesocycle {
 }
 
 model Microcycle {
-  id                String           @id @default(cuid())
-  mesocycleId       String
-  mesocycle         Mesocycle        @relation(fields: [mesocycleId], references: [id], onDelete: Cascade)
-  weekNumber        Int // 1..28
-  startDate         DateTime // segunda-feira
-  endDate           DateTime // domingo
-  type              String // DESENVOLVIMENTO | REGENERATIVO | TESTE | FLEXIVEL | COMPETICAO
-  targetKm          Float
-  targetTonnageKg   Float
-  targetSessions    Int
-  note              String?
-  sessions          TrainingSession[]
+  id              String            @id @default(cuid())
+  mesocycleId     String
+  mesocycle       Mesocycle         @relation(fields: [mesocycleId], references: [id], onDelete: Cascade)
+  weekNumber      Int // 1..28
+  startDate       DateTime // segunda-feira
+  endDate         DateTime // domingo
+  type            String // DESENVOLVIMENTO | REGENERATIVO | TESTE | FLEXIVEL | COMPETICAO
+  targetKm        Float
+  targetTonnageKg Float
+  targetSessions  Int
+  note            String?
+  sessions        TrainingSession[]
 }
 
 model TrainingSession {
-  id                  String          @id @default(cuid())
-  microcycleId        String
-  microcycle          Microcycle      @relation(fields: [microcycleId], references: [id], onDelete: Cascade)
-  date                DateTime
-  dayIndex            Int // 1=Seg ... 7=Dom
-  type                String // FORCA | CORRIDA | LPO | PLIOMETRIA | HIBRIDO | TESTE | ATIVACAO | REGEN
-  title               String
-  description         String
-  hrZone              String? // ex.: "Z2", "Z3-Z4"
-  paceTarget          String? // ex.: "4:45-4:55/km (ritmo alvo)"
+  id                    String          @id @default(cuid())
+  microcycleId          String
+  microcycle            Microcycle      @relation(fields: [microcycleId], references: [id], onDelete: Cascade)
+  date                  DateTime
+  dayIndex              Int // 1=Seg ... 7=Dom
+  type                  String // FORCA | CORRIDA | LPO | PLIOMETRIA | HIBRIDO | TESTE | ATIVACAO | REGEN
+  title                 String
+  description           String
+  hrZone                String? // ex.: "Z2", "Z3-Z4"
+  paceTarget            String? // ex.: "4:45-4:55/km (ritmo alvo)"
   durationPrescribedMin Int
-  durationActualMin   Int?
-  kmPrescribed        Float?
-  kmActual            Float?
-  tonnagePrescribedKg Float?
-  tonnageActualKg     Float?
-  rpePrescribed       Int? // Borg CR-10
-  rpeActual           Int?
-  loadPrescribed      Int? // sRPE = RPE x duração (UA Foster)
-  loadActual          Int?
-  status              String          @default("PLANEJADO") // PLANEJADO | CONCLUIDO | PARCIAL | AJUSTADO | NAO_REALIZADO
-  notes               String? // observações do atleta
-  coachNote           String? // observações da comissão
-  updatedAt           DateTime        @updatedAt
-  exercises           Exercise[]
-  stations            StationResult[]
+  durationActualMin     Int?
+  kmPrescribed          Float?
+  kmActual              Float?
+  tonnagePrescribedKg   Float?
+  tonnageActualKg       Float?
+  rpePrescribed         Int? // Borg CR-10
+  rpeActual             Int?
+  loadPrescribed        Int? // sRPE = RPE x duração (UA Foster)
+  loadActual            Int?
+  status                String          @default("PLANEJADO") // PLANEJADO | CONCLUIDO | PARCIAL | AJUSTADO | NAO_REALIZADO
+  notes                 String? // observações do atleta
+  coachNote             String? // observações da comissão
+  updatedAt             DateTime        @updatedAt
+  exercises             Exercise[]
+  stations              StationResult[]
 }
 
 model Exercise {
-  id              String         @id @default(cuid())
-  sessionId       String
-  session         TrainingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  order           Int
-  name            String
-  category        String // FORCA | LPO | PLIOMETRIA | CORE | TECNICO
-  setsPrescribed  Int?
-  repsPrescribed  String? // "10", "8/lado", "45s"
+  id               String          @id @default(cuid())
+  sessionId        String
+  session          TrainingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  order            Int
+  name             String
+  category         String // FORCA | LPO | PLIOMETRIA | CORE | TECNICO
+  setsPrescribed   Int?
+  repsPrescribed   String? // "10", "8/lado", "45s"
   loadPrescribedKg Float?
-  tempo           String?
-  rest            String?
-  setsActual      Int?
-  repsActual      String?
-  loadActualKg    Float?
-  notes           String?
+  tempo            String?
+  rest             String?
+  setsActual       Int?
+  repsActual       String?
+  loadActualKg     Float?
+  notes            String?
 }
 
 model StationResult {
@@ -128,7 +143,9 @@ model StationResult {
 
 model Wellness {
   id           String   @id @default(cuid())
-  date         DateTime @unique
+  athleteId    String
+  athlete      Athlete  @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  date         DateTime
   sleepHours   Float?
   sleepQuality Int? // 1-5
   soreness     Int? // 1-5 (dor muscular)
@@ -139,4 +156,26 @@ model Wellness {
   hrv          Int? // ms (RMSSD)
   weightKg     Float?
   notes        String?
+
+  @@unique([athleteId, date])
+}
+
+model HyresultRaceResult {
+  id             String   @id @default(cuid())
+  athleteId      String
+  athlete        Athlete  @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  resultCode     String // ex.: "LR3MS4JI5A0E80"
+  eventName      String // ex.: "HYROX Official Result — LR3MS4JI5A0E80"
+  eventDate      DateTime
+  division       String // "OPEN_M" | "OPEN_F" | "PRO_M" | "PRO_F"
+  ageGroup       String // ex.: "20-24"
+  totalTimeSec   Int
+  totalRunSec    Int
+  totalWorkSec   Int
+  totalRoxSec    Int
+  runSplitsJson  String // JSON array com 8 inteiros [run1Sec .. run8Sec]
+  workSplitsJson String // JSON object com as 8 estações { SKIERG, SLED_PUSH, SLED_PULL, BBJ, ROWING, FARMERS, SANDBAG, WALLBALLS }
+  roxSplitsJson  String // JSON array com 8 inteiros [rox1Sec .. rox8Sec]
+  notes          String?
+  createdAt      DateTime @default(now())
 }

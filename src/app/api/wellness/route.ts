@@ -5,9 +5,18 @@ import { todayUtc } from '@/lib/analytics'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const rows = await db.wellness.findMany({ orderBy: { date: 'desc' }, take: 30 })
+    const requestedAthleteId = req.nextUrl.searchParams.get('athleteId') ?? undefined
+    const athlete = requestedAthleteId
+      ? await db.athlete.findUnique({ where: { id: requestedAthleteId } })
+      : await db.athlete.findFirst({ orderBy: { createdAt: 'asc' } })
+
+    const rows = await db.wellness.findMany({
+      where: athlete ? { athleteId: athlete.id } : undefined,
+      orderBy: { date: 'desc' },
+      take: 30,
+    })
     return NextResponse.json(
       rows.map((w) => ({
         date: dateKey(w.date), sleepHours: w.sleepHours, sleepQuality: w.sleepQuality,
@@ -27,6 +36,15 @@ export async function POST(req: NextRequest) {
     const dstr: string = typeof b.date === 'string' && b.date ? b.date : dateKey(todayUtc())
     const date = new Date(`${dstr}T00:00:00.000Z`)
     if (Number.isNaN(date.getTime())) return NextResponse.json({ error: 'Data inválida' }, { status: 400 })
+
+    const athlete =
+      typeof b.athleteId === 'string' && b.athleteId
+        ? await db.athlete.findUnique({ where: { id: b.athleteId } })
+        : await db.athlete.findFirst({ orderBy: { createdAt: 'asc' } })
+
+    if (!athlete) {
+      return NextResponse.json({ error: 'Atleta não encontrado' }, { status: 404 })
+    }
 
     const int = (v: unknown): number | null => {
       if (v == null || v === '') return null
@@ -52,7 +70,11 @@ export async function POST(req: NextRequest) {
       notes: typeof b.notes === 'string' && b.notes ? b.notes : null,
     }
 
-    const row = await db.wellness.upsert({ where: { date }, create: { date, ...data }, update: data })
+    const row = await db.wellness.upsert({
+      where: { athleteId_date: { athleteId: athlete.id, date } },
+      create: { athleteId: athlete.id, date, ...data },
+      update: data,
+    })
     return NextResponse.json({ ok: true, date: dateKey(row.date) })
   } catch (e) {
     console.error('[api/wellness POST]', e)

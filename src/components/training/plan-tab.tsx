@@ -1,16 +1,16 @@
 'use client'
 
-// Periodização — visão macro, mesociclos, microciclo atual, zonas e bateria de testes
+// Periodização — visão macro, mesociclos, microciclo atual, zonas dinâmicas e bateria de testes do atleta ativo
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Badge } from '@/components/ui/badge'
-import { Target, Zap, CalendarRange, ClipboardCheck, Trophy, User, HeartPulse } from 'lucide-react'
+import { Target, Zap, CalendarRange, ClipboardCheck, Trophy, User, HeartPulse, Dumbbell } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { fmtDateShort, fmtClock } from '@/lib/format'
-import { HR_ZONES, TEST_BATTERY, WEEK_TYPE_META } from '@/lib/constants'
+import { DIVISION_META, HR_ZONES, TEST_BATTERY, WEEK_TYPE_META } from '@/lib/constants'
 import { PhaseBadge, TypeBadge, PHASE_SOLID, WeekTypeBadge } from './bits'
 import type { PlanResponse, WeekDetailResponse } from '@/lib/types'
 
@@ -31,15 +31,22 @@ export function PlanTab({ plan, onGoToWeek }: { plan: PlanResponse; onGoToWeek: 
   const a = plan.athlete
   const totalWeeks = plan.weeks.length
   const currentMeso = plan.mesocycles.find((m) => m.code === currentWeek?.phaseCode)
+  const activeZones = a.zones && a.zones.length > 0 ? a.zones : HR_ZONES
+  const divLabel = DIVISION_META[a.division]?.label ?? a.division
 
   return (
     <div className="space-y-4">
       {/* linha do tempo macro */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-base"><CalendarRange className="size-4 text-primary" /> Visão macro — {totalWeeks} semanas até a prova</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <CalendarRange className="size-4 text-primary" /> Visão macro — {totalWeeks} semanas até a prova ({a.name})
+          </CardTitle>
           <CardDescription>
-            26/out/2026 → 08–09/05/2027 · prova <strong className="text-foreground">{plan.race.name}</strong> · meta {a.goalRaceTime ? `${Math.floor(a.goalRaceTime / 60)}:${String(a.goalRaceTime % 60).padStart(2, '0')} (divisão Open)` : 'a definir'}
+            {fmtDateShort(plan.weeks[0]?.startDate ?? plan.race.date)} → {fmtDateShort(plan.race.date)} · prova{' '}
+            <strong className="text-foreground">{plan.race.name}</strong> · divisão{' '}
+            <strong className="text-primary">{divLabel}</strong> · meta{' '}
+            {a.goalRaceTime ? `${Math.floor(a.goalRaceTime / 60)}:${String(a.goalRaceTime % 60).padStart(2, '0')}` : 'a definir'}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -76,33 +83,69 @@ export function PlanTab({ plan, onGoToWeek }: { plan: PlanResponse; onGoToWeek: 
             </div>
           </TooltipProvider>
           <div className="mt-2 flex justify-between text-[11px] text-muted-foreground">
-            <span>{fmtDateShort(plan.weeks[0].startDate)}</span>
+            <span>{plan.weeks[0] ? fmtDateShort(plan.weeks[0].startDate) : ''}</span>
             <span>{fmtDateShort(plan.race.date)}</span>
           </div>
         </CardContent>
       </Card>
 
       <div className="grid gap-4 xl:grid-cols-3">
-        {/* perfil do atleta */}
+        {/* perfil e testes do atleta */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base"><User className="size-4 text-primary" /> Perfil do atleta</CardTitle>
+            <div className="flex items-center justify-between gap-2">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <User className="size-4 text-primary" /> Perfil & Testes Diagnósticos
+              </CardTitle>
+              <Badge variant="outline" className="border-primary/40 text-[10px] text-primary">
+                {divLabel} · {a.ageGroup}
+              </Badge>
+            </div>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
               <Item label="Nome" value={a.name} />
-              <Item label="Idade" value={`${a.age} anos (10/06/2005)`} />
-              <Item label="Altura" value="1,79 m" />
-              <Item label="Peso" value={`${a.weightKg.toLocaleString('pt-BR')} kg`} />
-              <Item label="Gordura corporal" value={`${a.bodyFatPct}%`} />
+              <Item label="Idade / Altura" value={`${a.age} anos · ${(a.heightCm / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} m`} />
+              <Item label="Peso / % GC" value={`${a.weightKg.toLocaleString('pt-BR')} kg · ${a.bodyFatPct}%`} />
               <Item label="PB 5 km" value={a.fiveKmPbSec ? fmtClock(a.fiveKmPbSec) : '—'} />
-              <Item label="VO₂max" value={a.vo2max != null ? `${a.vo2max.toLocaleString('pt-BR')} mL/kg/min` : 'teste pendente'} />
-              <Item label="VDOT" value={a.vdot != null ? String(a.vdot) : '—'} />
-              <Item label="VT1 (limiar aeróbico)" value={a.vt1SpeedKmh != null ? `${a.vt1SpeedKmh.toLocaleString('pt-BR')} km/h · ${fmtClock(3600 / a.vt1SpeedKmh)}/km` : '—'} />
-              <Item label="VT2 (limiar anaeróbico)" value={a.vt2SpeedKmh != null ? `${a.vt2SpeedKmh.toLocaleString('pt-BR')} km/h · ${fmtClock(3600 / a.vt2SpeedKmh)}/km` : '—'} />
-              <Item label="FC repouso / máxima" value={`${a.restingHr ?? '—'} / ${a.maxHr ?? '—'} bpm`} />
-              <Item label="Meta de prova" value={a.goalRaceTime ? `${Math.floor(a.goalRaceTime / 60)}:${String(a.goalRaceTime % 60).padStart(2, '0')}` : '—'} />
+              <Item label="VO₂max / VDOT" value={a.vo2max != null ? `${a.vo2max.toLocaleString('pt-BR')} mL/kg/min (VDOT ${a.vdot ?? '—'})` : 'teste pendente'} />
+              <Item label="FC rep / máx" value={`${a.restingHr ?? '—'} / ${a.maxHr ?? '—'} bpm`} />
+              <Item label="VT1 (aeróbico)" value={a.vt1SpeedKmh != null ? `${a.vt1SpeedKmh.toLocaleString('pt-BR')} km/h · ${fmtClock(Math.round(3600 / a.vt1SpeedKmh))}/km` : '—'} />
+              <Item label="VT2 (anaeróbico)" value={a.vt2SpeedKmh != null ? `${a.vt2SpeedKmh.toLocaleString('pt-BR')} km/h · ${fmtClock(Math.round(3600 / a.vt2SpeedKmh))}/km` : '—'} />
             </div>
+
+            <div className="rounded-lg border bg-muted/30 p-2.5">
+              <p className="mb-1.5 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-primary">
+                <Dumbbell className="size-3.5" /> Testes de Força (3RM), Potência & Ergômetros
+              </p>
+              <div className="grid grid-cols-3 gap-2 text-xs">
+                <div>
+                  <span className="text-[10px] text-muted-foreground">Agachamento 3RM</span>
+                  <p className="font-semibold tnum">{a.squat3rmKg ? `${a.squat3rmKg} kg` : '—'}</p>
+                </div>
+                <div>
+                  <span className="text-[10px] text-muted-foreground">Terra 3RM</span>
+                  <p className="font-semibold tnum">{a.deadlift3rmKg ? `${a.deadlift3rmKg} kg` : '—'}</p>
+                </div>
+                <div>
+                  <span className="text-[10px] text-muted-foreground">Supino 3RM</span>
+                  <p className="font-semibold tnum">{a.bench3rmKg ? `${a.bench3rmKg} kg` : '—'}</p>
+                </div>
+                <div>
+                  <span className="text-[10px] text-muted-foreground">Salto CMJ</span>
+                  <p className="font-semibold tnum">{a.cmjCm ? `${a.cmjCm} cm` : '—'}</p>
+                </div>
+                <div>
+                  <span className="text-[10px] text-muted-foreground">SkiErg 1km TT</span>
+                  <p className="font-semibold tnum">{a.skiErg1kTtSec ? fmtClock(a.skiErg1kTtSec) : '—'}</p>
+                </div>
+                <div>
+                  <span className="text-[10px] text-muted-foreground">Remo 500m TT</span>
+                  <p className="font-semibold tnum">{a.row500mTtSec ? fmtClock(a.row500mTtSec) : '—'}</p>
+                </div>
+              </div>
+            </div>
+
             {a.notes && <p className="rounded-md bg-muted/50 px-2.5 py-2 text-[11px] leading-relaxed text-muted-foreground">{a.notes}</p>}
           </CardContent>
         </Card>
@@ -213,11 +256,13 @@ export function PlanTab({ plan, onGoToWeek }: { plan: PlanResponse; onGoToWeek: 
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        {/* zonas */}
+        {/* zonas dinâmicas */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">Zonas de treinamento</CardTitle>
-            <CardDescription>Calibradas no teste incremental (VT1 10,0 km/h · VT2 11,9 km/h · FCmáx 201 bpm) — revalidar nas semanas 11 e 17</CardDescription>
+            <CardTitle className="text-base">Zonas de treinamento ({a.name})</CardTitle>
+            <CardDescription>
+              Calibradas nos testes do atleta (VT1 {a.vt1SpeedKmh ?? '—'} km/h · VT2 {a.vt2SpeedKmh ?? '—'} km/h · FCmáx {a.maxHr ?? '—'} bpm)
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
@@ -231,7 +276,7 @@ export function PlanTab({ plan, onGoToWeek }: { plan: PlanResponse; onGoToWeek: 
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {HR_ZONES.map((z) => (
+                {activeZones.map((z) => (
                   <TableRow key={z.zone}>
                     <TableCell className="py-2 text-xs font-semibold">{z.zone} · {z.name}</TableCell>
                     <TableCell className="py-2 text-xs tnum">{z.pctHrMax}</TableCell>

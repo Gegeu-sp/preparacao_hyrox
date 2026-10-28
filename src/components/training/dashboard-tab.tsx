@@ -6,12 +6,11 @@ import { useMemo, useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   CalendarDays, Flag, Gauge, HeartPulse, MapPin, TrendingUp, TriangleAlert, Dumbbell, Activity, Scale,
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import { fmtKm, fmtTon, fmtDateShort } from '@/lib/format'
 import { KpiCard, PhaseBadge } from './bits'
 import { VolumeChart, LoadCurveChart, AdherenceChart, ModalityChart, WellnessSpark } from './charts'
@@ -65,9 +64,9 @@ export function DashboardTab({ dash, plan, onDataChanged }: {
         />
         <KpiCard
           label="Aderência (semana)" icon={Activity}
-          value={k.adherenceWeekPct != null ? `${k.adherenceWeekPct}%` : '—'}
-          sub={k.adherenceOverallPct != null ? `geral: ${k.adherenceOverallPct}%` : 'registre as sessões'}
-          progress={k.adherenceWeekPct}
+          value={k.adherenceWeekPct != null ? `${k.adherenceWeekPct}%` : '0%'}
+          sub={`${k.completedSessionsTotal}/${k.plannedSessionsTotal} treinos confirmados`}
+          progress={k.adherenceWeekPct ?? 0}
           accent="primary"
         />
         <KpiCard
@@ -96,7 +95,7 @@ export function DashboardTab({ dash, plan, onDataChanged }: {
           <CardHeader className="pb-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
-                <CardTitle className="text-base">Prescrito vs Realizado — volume semanal</CardTitle>
+                <CardTitle className="text-base">Prescrito vs Realizado — volume semanal ({plan.athlete.name})</CardTitle>
                 <CardDescription>28 microciclos · {metric === 'km' ? 'quilometragem de corrida' : metric === 'ton' ? 'tonelagem de força/LPO' : 'carga interna (sRPE = RPE × min)'}</CardDescription>
               </div>
               <Tabs value={metric} onValueChange={(v) => setMetric(v as typeof metric)}>
@@ -158,7 +157,7 @@ export function DashboardTab({ dash, plan, onDataChanged }: {
           <CardHeader className="pb-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
-                <CardTitle className="flex items-center gap-2 text-base"><HeartPulse className="size-4 text-red-500" /> Bem-estar & recuperação</CardTitle>
+                <CardTitle className="flex items-center gap-2 text-base"><HeartPulse className="size-4 text-red-500" /> Bem-estar & recuperação ({plan.athlete.name})</CardTitle>
                 <CardDescription>
                   {todayWell
                     ? `Último registro: ${todayWell.date.split('-').reverse().join('/')} · sono ${todayWell.sleepHours ?? '—'}h · dor ${todayWell.soreness ?? '—'}/5 · fadiga ${todayWell.fatigue ?? '—'}/5 · HRV ${todayWell.hrv ?? '—'} ms`
@@ -179,7 +178,7 @@ export function DashboardTab({ dash, plan, onDataChanged }: {
               <WellnessSpark data={dash.wellness} dataKey="fatigue" label="Fadiga (1–5)" color="var(--chart-3)" />
             </div>
             <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1"><Scale className="size-3.5" /> Peso: {todayWell?.weightKg != null ? `${todayWell.weightKg.toLocaleString('pt-BR')} kg` : '—'}</span>
+              <span className="flex items-center gap-1"><Scale className="size-3.5" /> Peso: {todayWell?.weightKg != null ? `${todayWell.weightKg.toLocaleString('pt-BR')} kg` : `${plan.athlete.weightKg.toLocaleString('pt-BR')} kg`}</span>
               <span className="flex items-center gap-1"><Dumbbell className="size-3.5" /> Tonelagem semanal: {fmtTon(k.tonnageWeekA)} / {fmtTon(k.tonnageWeekP)} t</span>
               <span className="flex items-center gap-1"><Flag className="size-3.5" /> Meta de prova: {raceTarget ? `${Math.floor(raceTarget / 60)}:${String(raceTarget % 60).padStart(2, '0')}` : '—'}</span>
             </div>
@@ -190,6 +189,7 @@ export function DashboardTab({ dash, plan, onDataChanged }: {
       <WellnessDialog
         open={wellOpen}
         onOpenChange={setWellOpen}
+        athleteId={plan.athlete.id}
         initial={todayWell}
         onSaved={onDataChanged}
       />

@@ -1,27 +1,33 @@
-// Motor Preditivo de Desempenho e Tempo de Prova HYROX
-// Implementa os Princípios I (Sports Science) e II (Data Integrity) da Constituição
+// Motor Preditivo de Desempenho e Tempo de Prova HYROX — Dinâmico e Guiado pela Periodização
 import { db } from '@/lib/db'
 import {
   HYROX_OFFICIAL_SEGMENTS,
   RUN_FATIGUE_FACTORS,
-  DEFAULT_ROXZONE_SEC,
-  STATION_NORMATIVE_SECONDS_OPEN_M,
+  HYRESULT_DIVISION_BENCHMARKS,
+  DIVISION_STATION_SPECS,
   StationCode,
 } from '@/lib/constants'
 import { fmtClock, fmtClockHms, fmtPace } from '@/lib/format'
+import { computeLivePeriodizationEvolution } from '@/lib/live-evolution'
 import type {
+  HyroxDivision,
   RacePredictionDTO,
   SegmentPredictionSplitDTO,
-  PredictionScenarioInput,
 } from '@/lib/types'
 
 export interface AthletePredictionContext {
   athlete: {
+    id: string
     name: string
+    division: HyroxDivision
     vo2max: number | null
     vt1SpeedKmh: number | null
     vt2SpeedKmh: number | null
     fiveKmPbSec: number | null
+    skiErg1kTtSec: number | null
+    row500mTtSec: number | null
+    squat3rmKg: number | null
+    deadlift3rmKg: number | null
     goalRaceTime: number | null
   }
   stationHistory: Record<string, { best: number; avg: number; count: number }>
@@ -29,26 +35,29 @@ export interface AthletePredictionContext {
 }
 
 /**
- * Carrega atleta e dados históricos de estações do banco SQLite
+ * Carrega atleta (por id ou o primeiro cadastrado) e dados históricos de estações
  */
-export async function getAthleteAndHistoricalSplits(): Promise<AthletePredictionContext | null> {
-  const athlete = await db.athlete.findFirst({
-    select: {
-      name: true,
-      vo2max: true,
-      vt1SpeedKmh: true,
-      vt2SpeedKmh: true,
-      fiveKmPbSec: true,
-      goalRaceTime: true,
-    },
-  })
+export async function getAthleteAndHistoricalSplits(athleteId?: string): Promise<AthletePredictionContext | null> {
+  const athleteRow = athleteId
+    ? await db.athlete.findUnique({ where: { id: athleteId } })
+    : await db.athlete.findFirst({ orderBy: { createdAt: 'asc' } })
 
-  if (!athlete) return null
+  if (!athleteRow) return null
 
-  // Carrega splits de estações realizados
+  const division = (['OPEN_M', 'OPEN_F', 'PRO_M', 'PRO_F'].includes(athleteRow.division)
+    ? athleteRow.division
+    : 'OPEN_M') as HyroxDivision
+
   const results = await db.stationResult.findMany({
     where: {
       splitActualSec: { not: null, gt: 0 },
+      session: {
+        microcycle: {
+          mesocycle: {
+            athleteId: athleteRow.id,
+          },
+        },
+      },
     },
     select: {
       station: true,
@@ -94,53 +103,56 @@ export async function getAthleteAndHistoricalSplits(): Promise<AthletePrediction
   }
 
   return {
-    athlete,
+    athlete: {
+      id: athleteRow.id,
+      name: athleteRow.name,
+      division,
+      vo2max: athleteRow.vo2max,
+      vt1SpeedKmh: athleteRow.vt1SpeedKmh,
+      vt2SpeedKmh: athleteRow.vt2SpeedKmh,
+      fiveKmPbSec: athleteRow.fiveKmPbSec,
+      skiErg1kTtSec: athleteRow.skiErg1kTtSec,
+      row500mTtSec: athleteRow.row500mTtSec,
+      squat3rmKg: athleteRow.squat3rmKg,
+      deadlift3rmKg: athleteRow.deadlift3rmKg,
+      goalRaceTime: athleteRow.goalRaceTime,
+    },
     stationHistory,
-    simulationCount: Math.floor(simCount / 8),
+    simulationCount: Math.max(1, Math.ceil(simCount / 4)),
   }
 }
 
-/**
- * Calcula a velocidade base de corrida (em segundos por km)
- */
 export function calculateBaseRunningPace(athlete: AthletePredictionContext['athlete']): number {
-  // 1. Se possuir VT2 (limiar anaeróbico), é o ritmo ótimo de sustentação do Hyrox
   if (athlete.vt2SpeedKmh && athlete.vt2SpeedKmh > 0) {
-    // Ex.: 11.9 km/h -> 3600 / 11.9 = ~302.5s (~5:02/km)
-    // Para prova pura de 8km com quebras, o pace base de corrida 1 fresca é cerca de 95% do limiar
     return Math.round((3600 / athlete.vt2SpeedKmh) * 0.96)
   }
 
-  // 2. Se possuir 5km PB
   if (athlete.fiveKmPbSec && athlete.fiveKmPbSec > 0) {
     const pace5k = athlete.fiveKmPbSec / 5
-    // Pace base Hyrox ~5% mais conservador que 5km all-out
     return Math.round(pace5k * 1.05)
   }
 
-  // 3. Fallback por VO2max (estimativa vVO2max)
   if (athlete.vo2max && athlete.vo2max > 0) {
-    const estimatedSpeedKmh = (athlete.vo2max - 3.5) / 3.5 // aproximação de Léger/Mercier
+    const estimatedSpeedKmh = (athlete.vo2max - 3.5) / 3.5
     const thresholdSpeed = estimatedSpeedKmh * 0.85
     return Math.round(3600 / thresholdSpeed)
   }
 
-  // Padrão geral Open Masculino: 4:50/km (290s)
-  return 290
+  return HYRESULT_DIVISION_BENCHMARKS[athlete.division].stations.RUN_1KM.medianSec
 }
 
-/**
- * Computa a previsão de prova integral
- */
-export async function computeRacePrediction(): Promise<RacePredictionDTO | null> {
-  const ctx = await getAthleteAndHistoricalSplits()
-  if (!ctx) return null
+export async function computeRacePrediction(athleteId?: string): Promise<RacePredictionDTO | null> {
+  const [ctx, liveEvolution] = await Promise.all([
+    getAthleteAndHistoricalSplits(athleteId),
+    computeLivePeriodizationEvolution(athleteId),
+  ])
+  if (!ctx || !liveEvolution) return null
 
-  const { athlete, stationHistory, simulationCount } = ctx
-  const basePaceSec = calculateBaseRunningPace(athlete)
-  const targetGoalTimeSec = athlete.goalRaceTime ?? 4500 // default 01:15:00
+  const { athlete, stationHistory } = ctx
+  const { liveState, targetW28State, progression, weeklySimulationCurve, sessionEvolution } = liveEvolution
+  const targetGoalTimeSec = athlete.goalRaceTime ?? progression.targetWeek28TotalSec
+  const divLoads = DIVISION_STATION_SPECS[athlete.division]
 
-  // Gera os 16 segmentos nominais
   let runIndex = 1
   const segments: SegmentPredictionSplitDTO[] = []
   const criticalStations: string[] = []
@@ -151,12 +163,11 @@ export async function computeRacePrediction(): Promise<RacePredictionDTO | null>
 
   for (const seg of HYROX_OFFICIAL_SEGMENTS) {
     if (seg.type === 'RUN') {
-      const fatigueFactor = RUN_FATIGUE_FACTORS[runIndex] ?? 1.05
-      const predictedSec = Math.round(basePaceSec * fatigueFactor)
+      const idx = runIndex - 1
+      const predictedSec = liveState.runSplits[idx] ?? calculateBaseRunningPace(athlete)
+      const targetSec = targetW28State.runSplits[idx] ?? Math.round((targetGoalTimeSec * 0.52) / 8)
+      const fatigueFactor = liveState.fatigueFactors[idx] ?? RUN_FATIGUE_FACTORS[runIndex] ?? 1.05
       totalRunSec += predictedSec
-
-      // Meta proporcional (distribuição equilibrada)
-      const targetSec = Math.round((targetGoalTimeSec * 0.52 / 8) * (fatigueFactor / 1.05))
 
       segments.push({
         order: seg.order,
@@ -171,33 +182,27 @@ export async function computeRacePrediction(): Promise<RacePredictionDTO | null>
         targetFormatted: fmtClock(targetSec),
         paceMinKmFormatted: fmtPace(predictedSec),
         fatigueFactorApplied: fatigueFactor,
-        isCritical: fatigueFactor >= 1.12, // runs pós-sled e pós-sandbag
+        isCritical: runIndex === 3 || runIndex === 8 || predictedSec > targetSec * 1.09,
         historicalBestSec: null,
       })
 
       if (runIndex === 8) {
-        warnings.push('Corrida 8 projeta decaimento de +15% de pace devido à fadiga excêntrica do Sandbag')
+        const dropVsRun1 = predictedSec - (liveState.runSplits[0] ?? predictedSec)
+        warnings.push(
+          `Corrida 8 (pós-Sandbag Lunges) projeta +${dropVsRun1}s sobre o Km 1 — os Bricks de Sábado (SPP1/SPP2) reduzem esse decaimento.`,
+        )
       }
 
       runIndex++
     } else {
-      // Estação Funcional
       const stCode = seg.stationCode as StationCode
-      const normativeSec = STATION_NORMATIVE_SECONDS_OPEN_M[stCode] ?? 240
+      const predictedSec = liveState.workSplits[stCode] ?? 220
+      const targetSec = targetW28State.workSplits[stCode] ?? Math.round(predictedSec * 0.92)
       const hist = stationHistory[stCode]
-
-      let predictedSec = normativeSec
-      let historicalBestSec: number | null = null
-
-      if (hist && hist.count > 0) {
-        historicalBestSec = hist.best
-        // Ponderação: 60% média recente + 40% melhor histórico
-        predictedSec = Math.round(hist.avg * 0.6 + hist.best * 0.4)
-      }
+      const historicalBestSec = hist && hist.count > 0 ? hist.best : null
 
       totalStationsSec += predictedSec
-      const targetSec = Math.round(normativeSec * 0.95)
-      const isCritical = predictedSec > targetSec * 1.12
+      const isCritical = predictedSec > targetSec * 1.09
 
       if (isCritical) {
         criticalStations.push(seg.key)
@@ -207,7 +212,7 @@ export async function computeRacePrediction(): Promise<RacePredictionDTO | null>
         order: seg.order,
         segmentKey: seg.key,
         type: 'STATION',
-        name: `${seg.name} (${seg.description})`,
+        name: `${seg.name} (${divLoads.stationLoadDesc[stCode]})`,
         distanceM: seg.distanceM ?? null,
         reps: seg.reps ?? null,
         predictedSec,
@@ -222,26 +227,26 @@ export async function computeRacePrediction(): Promise<RacePredictionDTO | null>
     }
   }
 
-  const roxzoneSec = DEFAULT_ROXZONE_SEC
+  const roxzoneSec = liveState.roxSplits.reduce((a, b) => a + b, 0)
   const realisticTotalSec = totalRunSec + totalStationsSec + roxzoneSec
 
-  // Cenário Otimista: -2.5% corrida, -3% estações, -15% roxzone
-  const optRun = Math.round(totalRunSec * 0.975)
-  const optSt = Math.round(totalStationsSec * 0.97)
-  const optRox = Math.round(roxzoneSec * 0.85)
-  const optimisticTotalSec = optRun + optSt + optRox
+  // O cenário otimista projeta a evolução esperada ao concluir 100% da periodização até a Semana 28
+  const optimisticTotalSec = Math.min(
+    progression.targetWeek28TotalSec,
+    Math.round(totalRunSec * 0.97 + totalStationsSec * 0.96 + roxzoneSec * 0.88),
+  )
 
-  // Cenário Conservador: +3.5% corrida, +5% estações, +15% roxzone
   const consRun = Math.round(totalRunSec * 1.035)
   const consSt = Math.round(totalStationsSec * 1.05)
-  const consRox = Math.round(roxzoneSec * 1.15)
+  const consRox = Math.round(roxzoneSec * 1.12)
   const conservativeTotalSec = consRun + consSt + consRox
 
   const deltaSec = realisticTotalSec - targetGoalTimeSec
   const deltaPct = Math.round((deltaSec / targetGoalTimeSec) * 1000) / 10
 
+  const completedCount = progression.completedSessionsCount
   const confidenceLevel: RacePredictionDTO['confidenceLevel'] =
-    simulationCount >= 2 ? 'ALTA' : simulationCount === 1 ? 'MEDIA' : 'ESTIMATIVA_INICIAL'
+    completedCount >= 6 ? 'ALTA' : completedCount >= 2 ? 'MEDIA' : 'ESTIMATIVA_INICIAL'
 
   return {
     generatedAt: new Date().toISOString(),
@@ -265,12 +270,14 @@ export async function computeRacePrediction(): Promise<RacePredictionDTO | null>
     deltaPct,
     isWithinGoal: deltaSec <= 0,
     confidenceLevel,
-    simulationCountUsed: simulationCount,
+    simulationCountUsed: completedCount,
     criticalStations,
     warnings,
     segments,
+    progression,
+    weeklySimulationCurve,
+    sessionEvolution,
   }
 }
 
 export { simulatePredictionScenario } from '@/lib/predictions-calc'
-
