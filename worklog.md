@@ -145,3 +145,25 @@ Work Log:
 Stage Summary:
 - README.md profissional, moderno e de alto impacto publicado e sincronizado com o GitHub.
 
+---
+Task ID: 11
+Agent: Antigravity (Speckit Workflow)
+Task: Reestruturação do README.md para o Projeto HYROX CONTROL & Preservação do PROFILE_README.md
+
+Work Log:
+- Preservado o portfólio de perfil completo no arquivo `PROFILE_README.md` para utilização no repositório de perfil pessoal (`Gegeu-sp/Gegeu-sp`).
+- Reescrito o `README.md` principal da raiz com foco total no projeto atual (**HYROX CONTROL — Preparação Hyrox**).
+- Adicionadas seções completas:
+  - Banner dinâmico com título e subtítulo animados (Typing SVG) e badges de tecnologias (Next.js 16, React 19, TypeScript 5, Tailwind v4, Prisma 6, SQLite).
+  - Visão Geral do projeto para a preparação de 28 semanas do atleta Rafael Nogueira com o coach Argeu Rodrigues.
+  - Fundamentação científica completa com fórmulas matemáticas em LaTeX: sRPE de Foster, tonelagem muscular ($\Sigma \text{séries} \times \text{reps} \times \text{carga}$), modelo EWMA de Banister (Fitness 42d, Fadiga 7d, Forma), ACWR 7:28 com faixas de risco/sweet spot, e motor preditivo HYROX.
+  - Diagrama de arquitetura de fluxo em Mermaid.
+  - Detalhamento das funcionalidades (Dashboard Analítico com KPIs e gráficos Recharts, Periodização Macro/Meso/Micro em 7 mesociclos e 196 sessões, Diário de Treino com Session Sheet lateral e recálculo automático de tonelagem, Diário de Bem-Estar/Wellness, e Motor Preditivo de Prova com simulador What-If).
+  - Tabela detalhada da Stack Tecnológica e árvore de estrutura de pastas.
+  - Guia passo a passo de como executar localmente (`bun install`, `bun run db:push`, `bun dev`).
+  - Rodapé obrigatório com identificação canônica do desenvolvedor (Argeu Rodrigues, 4º semestre ADS Anhembi Morumbi, Personal Trainer CREF 158814-G/SP, Supervisor LPO System) e badges clicáveis de contato (LinkedIn, GitHub, Email e Instagram).
+- Commit e push automático realizados para `origin main`.
+
+Stage Summary:
+- README.md do projeto HYROX CONTROL finalizado com excelência visual e científica; PROFILE_README.md arquivado para o perfil GitHub.
+

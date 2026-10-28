@@ -1,29 +1,25 @@
 <div align="center">
 
-  <!-- Header Banner -->
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,12,18,24&height=220&section=header&text=Argeu%20Rodrigues&fontSize=42&fontAlignY=36&desc=Software%20Engineer%20%E2%80%A2%20Strength%20Coach%20%E2%80%A2%20Sports%20Scientist&descAlignY=58&descAlign=50&theme=dark" width="100%" alt="Argeu Rodrigues Header Banner" />
+  <!-- Banner Capsule Render -->
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=10,13,19,25&height=240&section=header&text=HYROX%20CONTROL&fontSize=46&fontAlignY=36&desc=Painel%20Cient%C3%ADfico%20de%20Periodiza%C3%A7%C3%A3o%20%26%20Motor%20Preditivo%20de%20Prova&descAlignY=58&descAlign=50&theme=dark" width="100%" alt="HYROX CONTROL Header Banner" />
 
-  <!-- Dynamic Typing Subtitle -->
-  <a href="https://github.com/Gegeu-sp">
-    <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=20&duration=2800&pause=900&color=10B981&center=true&vCenter=true&width=700&lines=Engenharia+de+Software+%26+Arquitetura+de+Sistemas;Strength+Coach+%E2%80%A2+Especialista+em+Performance+Humana;Next.js+%E2%80%A2+TypeScript+%E2%80%A2+Python+%E2%80%A2+Docker+%E2%80%A2+PostgreSQL;Modelagem+Preditiva+aplicada+%C3%A0+Ci%C3%AAncia+do+Esporte" alt="Dynamic Typing Subtitle" />
+  <!-- Subtítulo Animado -->
+  <a href="#-visão-geral">
+    <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=18&duration=2800&pause=900&color=10B981&center=true&vCenter=true&width=750&lines=Periodiza%C3%A7%C3%A3o+de+Alta+Performance+%E2%80%A2+28+Semanas+%E2%80%A2+196+Sess%C3%B5es;Controle+de+Carga%3A+Foster+sRPE+%E2%80%A2+Banister+EWMA+42%3A7+%E2%80%A2+ACWR;Motor+Preditivo+Fisiol%C3%B3gico+calibrado+por+VT1%2FVT2+e+VO%E2%82%82max;Next.js+16+%E2%80%A2+React+19+%E2%80%A2+TypeScript+5+%E2%80%A2+Tailwind+v4+%E2%80%A2+Prisma" alt="Dynamic Subtitle Typing SVG" />
   </a>
 
   <br />
   <br />
 
-  <!-- Quick Social Badges Header -->
-  <a href="https://br.linkedin.com/in/argeu-rodrigues-9a6b7174" target="_blank">
-    <img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn Badge" />
-  </a>
-  <a href="https://github.com/Gegeu-sp" target="_blank">
-    <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Badge" />
-  </a>
-  <a href="mailto:argeurodrigues25@gmail.com" target="_blank">
-    <img src="https://img.shields.io/badge/E--mail-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Email Badge" />
-  </a>
-  <a href="https://instagram.com/argeurodrigueslpo" target="_blank">
-    <img src="https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white" alt="Instagram Badge" />
-  </a>
+  <!-- Badges de Tecnologia e Status -->
+  <p align="center">
+    <img src="https://img.shields.io/badge/Next.js_16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js 16" />
+    <img src="https://img.shields.io/badge/React_19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React 19" />
+    <img src="https://img.shields.io/badge/TypeScript_5-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript 5" />
+    <img src="https://img.shields.io/badge/Tailwind_CSS_v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS v4" />
+    <img src="https://img.shields.io/badge/Prisma_ORM_6-2D3748?style=for-the-badge&logo=prisma&logoColor=white" alt="Prisma 6" />
+    <img src="https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite" />
+  </p>
 
 </div>
 
@@ -31,150 +27,223 @@
 
 ---
 
-## 🎯 Sobre Mim • Who Am I
+## 📖 Visão Geral
 
-> *"Onde o rigor do treinamento de força de alto rendimento encontra a precisão da engenharia de software."*
+O **HYROX CONTROL** é uma plataforma analítica de engenharia de software e ciência do esporte desenvolvida especificamente para a **preparação física de alta performance para a prova HYROX** (alvo: 8 e 9 de Maio de 2027 — ciclo estruturado de 28 semanas para o atleta **Rafael Nogueira**).
 
-Olá! Sou **Argeu Rodrigues**, desenvolvedor de software e profissional de Educação Física. Atualmente estou no **4º semestre de Análise e Desenvolvimento de Sistemas (ADS) na Universidade Anhembi Morumbi**.
-
-Possuo uma trajetória consolidada como **Personal Trainer e Strength Coach (CREF: 158814-G/SP)**, atuando também como **supervisor no LPO System**. Minha experiência com periodização atlética, biomecânica e fisiologia do exercício moldou em mim uma mentalidade orientada a **métricas, controle sistemático de variáveis e consistência operacional**.
-
-Hoje, aplico essa bagagem na **Engenharia de Software e Arquitetura de Sistemas**, projetando aplicações web modernas, microsserviços distribuídos e ecossistemas orientados a dados que resolvem problemas reais com alto desempenho e confiabilidade.
-
-- 🎓 **Formação:** Análise e Desenvolvimento de Sistemas (ADS) — Anhembi Morumbi (4º Semestre)
-- 🏋️ **Área Esportiva:** Personal Trainer, Strength Coach & Supervisor LPO System (CREF: 158814-G/SP)
-- 🚀 **Foco Atual:** Desenvolvimento Full Stack (TypeScript / Python), Arquitetura Limpa, Microsserviços e Engenharia de Aplicações Preditivas
-- 📍 **Localização:** São Paulo, Brasil
+A aplicação substitui planilhas estáticas por um ecossistema reativo moderno, integrando:
+1. **Monitoramento Biomecânico e de Carga Interna/Externa**: acompanhamento diário de volume ($km$), intensidade ($RPE$), tonelagem muscular acumulada ($\Sigma \text{séries} \times \text{reps} \times \text{carga}$) e carga de esforço ponderada ($sRPE$).
+2. **Modelagem Matemática de Fadiga e Prontidão**: cálculo contínuo de curvas de condicionamento físico (*Fitness* EWMA 42 dias) e estresse neuromuscular residual (*Fadiga* EWMA 7 dias) segundo o modelo Banister, além da razão de estresse agudo-crônico (*ACWR*).
+3. **Motor Preditivo Determinístico de Prova (HYROX Race Predictor)**: algoritmo calibrado pelos limiares ventilatórios reais do atleta ($VT_1$, $VT_2$, $VO_2\text{max}$ e $PB$ de $5\text{ km}$), projetando os 16 segmentos da prova (8x $1\text{ km}$ intercalados com as 8 estações funcionais e tempos de *Roxzone*) com simulador tático *What-If*.
 
 ---
 
-## 🛠️ Tech Stack & Ferramentas
+## 🔬 Fundamentação Científica & Modelos Matemáticos
 
-### 💻 Linguagens & Core
-<p align="left">
-  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
-  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript" />
-  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java" />
-</p>
+A aplicação implementa formulações validadas pela literatura internacional de fisiologia do exercício e periodização desportiva:
 
-### 🎨 Frontend & UI Ecosystem
-<p align="left">
-  <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
-  <img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js" />
-  <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
-  <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5" />
-  <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3" />
-</p>
+```mermaid
+flowchart LR
+    A[Sessão Executada] --> B[Cálculo de sRPE Foster]
+    A --> C[Tonelagem Muscular]
+    B --> D[EWMA 7d - Fadiga]
+    B --> E[EWMA 42d - Fitness]
+    D & E --> F[Forma / Prontidão Biológica]
+    B --> G[ACWR 7:28]
+    H[Teste Incremental VT1/VT2] --> I[Motor Preditivo HYROX]
+    I --> J[16 Splits + Roxzone + Cenários]
+```
 
-### ⚙️ Backend, Mensageria & Bancos de Dados
-<p align="left">
-  <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js" />
-  <img src="https://img.shields.io/badge/REST_APIs-005571?style=for-the-badge&logo=fastapi&logoColor=white" alt="REST APIs" />
-  <img src="https://img.shields.io/badge/Prisma_ORM-2D3748?style=for-the-badge&logo=prisma&logoColor=white" alt="Prisma ORM" />
-  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
-  <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase" />
-  <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL" />
-  <img src="https://img.shields.io/badge/RabbitMQ-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white" alt="RabbitMQ" />
-</p>
+### 1. Carga de Sessão (sRPE de Foster)
+A carga interna de cada sessão é quantificada pela percepção subjetiva de esforço multiplicada pela duração:
+$$\text{Carga (U.A.)} = \text{Duração (min)} \times \text{RPE (Escala 1--10)}$$
 
-### 📦 DevOps, Ambientes & Ferramentas
-<p align="left">
-  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
-  <img src="https://img.shields.io/badge/Linux_Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white" alt="Linux Ubuntu" />
-  <img src="https://img.shields.io/badge/WSL-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="WSL" />
-  <img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white" alt="Git" />
-  <img src="https://img.shields.io/badge/VS_Code-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white" alt="VS Code" />
-  <img src="https://img.shields.io/badge/Cursor.ai-000000?style=for-the-badge&logo=openai&logoColor=white" alt="Cursor.ai" />
-  <img src="https://img.shields.io/badge/Trae_IDE-4338CA?style=for-the-badge&logo=visualstudio&logoColor=white" alt="Trae IDE" />
-</p>
+### 2. Tonelagem Muscular Total
+$$\text{Tonelagem (kg)} = \sum_{i=1}^{n} (\text{Séries}_i \times \text{Repetições}_i \times \text{Carga (kg)}_i)$$
 
----
+### 3. Modelo Fitness-Fadiga de Banister (EWMA)
+Para modelar a adaptação biológica sem defasagem temporal abrupta, utiliza-se a Média Móvel Exponencialmente Ponderada:
+$$\text{EWMA}_t = \text{Carga}_t \times \lambda + \text{EWMA}_{t-1} \times (1 - \lambda), \quad \text{onde } \lambda = \frac{2}{N + 1}$$
+- **Fitness (Aptidão):** Janela de 42 dias ($N=42$)
+- **Fadiga (Sobrecarga):** Janela de 7 dias ($N=7$)
+- **Forma / Prontidão:** $\text{Forma} = \text{Fitness} - \text{Fadiga}$
 
-## 🚀 Projetos em Destaque • Featured Projects
+### 4. Razão de Carga Agudo-Crônica (ACWR 7:28)
+Controla o risco de lesão através da relação entre a sobrecarga aguda (últimos 7 dias) e o condicionamento acumulado (últimos 28 dias):
+$$\text{ACWR} = \frac{\text{Média Diária (7 dias)}}{\text{Média Diária (28 dias)}}$$
+- **Zona Segura (*Sweet Spot*):** $0.8 \le \text{ACWR} \le 1.3$
+- **Zona de Atenção:** $1.3 < \text{ACWR} \le 1.5$
+- **Zona de Perigo (*Danger Zone*):** $\text{ACWR} > 1.5$
 
-<table>
-  <tr>
-    <td width="50%" valign="top">
-      <h3>⚡ Nexus Core</h3>
-      <p><strong>Health & Performance Predictive Digital Twin Web App</strong></p>
-      <p>Aplicação web inovadora com modelagem de gêmeos digitais preditivos para atletas e praticantes de alto desempenho. Implementa análise contínua de prontidão biológica, curvas de fadiga neuromuscular e predições baseadas em dados metabólicos.</p>
-      <p>
-        <img src="https://img.shields.io/badge/Next.js-black?style=flat-square&logo=next.js" alt="Next.js" />
-        <img src="https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma" alt="Prisma" />
-        <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL" />
-        <img src="https://img.shields.io/badge/Auth.js-purple?style=flat-square" alt="Auth.js" />
-      </p>
-      <a href="https://github.com/Gegeu-sp" target="_blank">🔗 Ver Repositório</a>
-    </td>
-    <td width="50%" valign="top">
-      <h3>💬 WhatsApp Workout Management</h3>
-      <p><strong>Sistema Inteligente de Processamento Multimodal de Treinos</strong></p>
-      <p>Plataforma automatizada que realiza a ingestão e transcrição de mensagens de áudio e texto de treinos via WhatsApp. Utiliza inteligência artificial generativa para extração estruturada de exercícios e cálculo dinâmico de <em>tonnage</em> ($\Sigma \text{séries} \times \text{reps} \times \text{carga}$).</p>
-      <p>
-        <img src="https://img.shields.io/badge/Evolution_API-25D366?style=flat-square&logo=whatsapp&logoColor=white" alt="Evolution API" />
-        <img src="https://img.shields.io/badge/Gemini_API-4E75A0?style=flat-square&logo=google&logoColor=white" alt="Gemini API" />
-        <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL" />
-        <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=node.js&logoColor=white" alt="Node.js" />
-      </p>
-      <a href="https://github.com/Gegeu-sp" target="_blank">🔗 Ver Repositório</a>
-    </td>
-  </tr>
-  <tr>
-    <td width="50%" valign="top">
-      <h3>🛡️ Aegis-Notifier</h3>
-      <p><strong>Microsserviço Resiliente de Mensageria e Notificações</strong></p>
-      <p>Arquitetura distribuída orientada a eventos para despacho assíncrono de alertas e notificações com tolerância a falhas. Implementa filas seguras, garantia de entrega idempotente e containerização total para rápida escalabilidade.</p>
-      <p>
-        <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" />
-        <img src="https://img.shields.io/badge/RabbitMQ-FF6600?style=flat-square&logo=rabbitmq&logoColor=white" alt="RabbitMQ" />
-        <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL" />
-        <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker" />
-      </p>
-      <a href="https://github.com/Gegeu-sp" target="_blank">🔗 Ver Repositório</a>
-    </td>
-    <td width="50%" valign="top">
-      <h3>🏆 HYROX Control & Race Predictor</h3>
-      <p><strong>Periodização Científica & Motor de Predição Determinística</strong></p>
-      <p>Sistema completo de controle de carga de treinamento (sRPE Foster, ACWR, modelo EWMA 42:7 de Banister) e motor preditivo de prova HYROX calibrado por limiares metabólicos (VT1/VT2 e VO₂max) com simulador de cenários <em>What-If</em>.</p>
-      <p>
-        <img src="https://img.shields.io/badge/Next.js_16-black?style=flat-square&logo=next.js" alt="Next.js 16" />
-        <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
-        <img src="https://img.shields.io/badge/Tailwind_v4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind" />
-        <img src="https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma" alt="Prisma" />
-      </p>
-      <a href="https://github.com/Gegeu-sp/preparacao_hyrox" target="_blank">🔗 Ver Repositório</a>
-    </td>
-  </tr>
-</table>
+### 5. Motor Preditivo de Prova HYROX
+Projeta o tempo total da prova decompondo os 16 segmentos oficiais:
+$$\text{Tempo Total} = \sum_{k=1}^{8} \text{Run}_k + \sum_{s=1}^{8} \text{Estação}_s + \text{Roxzone}$$
+- Velocidade base calibrada por $VT_2$ e $PB$ de $5\text{ km}$.
+- Multiplicadores de fadiga neuromuscular por segmento (ex.: *Run 3* pós-Sled Pull $= 1.12$, *Run 8* pós-Wall Balls $= 1.15$).
+- Projeção de 3 cenários probabilísticos: **Realista**, **Otimista** ($-3\%$) e **Conservador** ($+5\%$).
 
 ---
 
-## 📊 Estatísticas do GitHub • GitHub Analytics
+## ⚡ Funcionalidades da Plataforma
 
-<div align="center">
-  <table border="0">
-    <tr>
-      <td align="center" valign="middle">
-        <img src="https://github-readme-stats.vercel.app/api?username=Gegeu-sp&show_icons=true&theme=tokyonight&hide_border=false&border_radius=10&count_private=true" alt="Estatísticas do GitHub de Argeu Rodrigues" />
-      </td>
-      <td align="center" valign="middle">
-        <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=Gegeu-sp&layout=compact&theme=tokyonight&hide_border=false&border_radius=10" alt="Linguagens mais utilizadas por Argeu Rodrigues" />
-      </td>
-    </tr>
-  </table>
+### 1. 📊 Dashboard Analítico Central
+- **6 KPI Cards Dinâmicos:** Volume semanal ($km$), Tonelagem acumulada ($kg$), Carga $sRPE$, Aderência Prescrito vs. Realizado, e indicadores biométricos.
+- **Gráficos Interativos (Recharts):**
+  - Volume semanal e distribuição diária.
+  - Curva de Fitness-Fadiga EWMA com histórico temporal e alertas de sobretreinamento.
+  - Distribuição percentual do volume por modalidade (Corrida, Força, LPO, Híbrido, Regenerativo).
 
-  <br />
+### 2. 🗓️ Macro e Mesociclos (28 Semanas)
+- Estruturação completa em 7 Mesociclos periodizados:
+  - `DIAG`: Diagnóstico e baterias de testes fisiológicos (Semana 1).
+  - `GPP1` & `GPP2`: Preparação Geral, base aeróbica e capacidade de trabalho (Semanas 2 a 11).
+  - `SPP1` & `SPP2`: Preparação Específica com transições Hyrox e estações pesadas (Semanas 12 a 22).
+  - `COMP`: Período Competitivo com Meia-Simulação e Simulações Oficiais completas (Semanas 23 a 26).
+  - `TAPER`: Polimento neuromuscular e supercompensação energética (Semanas 27 e 28).
+- 196 sessões detalhadas com foco, zonas de frequência cardíaca ($Z_1$ a $Z_5$) e prescrição de carga.
 
-  <img src="https://github-readme-streak-stats.herokuapp.com/?user=Gegeu-sp&theme=tokyonight&hide_border=false&border_radius=10" alt="Sequência de Contribuições no GitHub" />
-</div>
+### 3. 📝 Diário Semanal & Edição Interativa de Treino
+- Navegação entre microciclos com identificação instantânea de dias concluídos, atrasados ou planejados.
+- **Session Sheet Lateral:** interface deslizante completa para ajuste fino:
+  - Registro de duração, percepção subjetiva de esforço ($RPE$), quilometragem e frequência cardíaca média.
+  - Editor de exercícios com séries, repetições e cargas com **recálculo instantâneo de tonelagem**.
+  - Registro dos splits das 8 estações HYROX com cálculo de delta em relação à meta.
 
-<br />
+### 4. 🧘 Acompanhamento de Prontidão e Bem-Estar (Wellness)
+- Registro diário de variáveis psicométricas em escala Likert (1 a 5): qualidade do sono, estresse, fadiga muscular, motivação e dores articulares.
+- Inserção de marcadores fisiológicos objetivos: frequência cardíaca de repouso ($FC_{\text{rep}}$), variabilidade da frequência cardíaca ($HRV$) e peso corporal.
+
+### 5. ⏱️ HYROX Race Predictor & Simulador "What-If"
+- **Visão Macro de Prova:** projeção dos cenários Realista, Otimista e Conservador com cálculo de delta contra o objetivo cadastrado.
+- **Tabela dos 16 Segmentos:** paces projetados ($min/km$), tempo em cada estação funcional e bandeiras visuais automáticas para estações críticas (tempo $> 15\%$ acima da meta).
+- **Simulador Tático:** sliders interativos para ajuste em tempo real de pace de corrida, tempos de estações e transições na Roxzone, recalculando imediatamente a projeção final de tempo.
+
+---
+
+## 🧱 Arquitetura e Stack Tecnológica
+
+| Camada | Tecnologia | Descrição |
+| :--- | :--- | :--- |
+| **Framework Full Stack** | **Next.js 16 (App Router)** | Renderização híbrida (Server & Client Components) com alta performance |
+| **Biblioteca de UI** | **React 19** | Arquitetura reativa e componentização atômica |
+| **Linguagem** | **TypeScript 5** | Tipagem estrita ponta a ponta sem uso de `any` |
+| **Estilização & Design** | **Tailwind CSS v4** | Design system responsivo com tema dark esportivo (Zinc, Emerald, Amber, Lime) |
+| **Componentes de UI** | **shadcn/ui & Radix UI** | Primitivas acessíveis (Sheet, Dialog, Tabs, Slider, Progress, Sonner) |
+| **Visualização de Dados** | **Recharts 2.15** | Gráficos compostos de volume, dispersão, curvas de carga e donuts |
+| **Camada de Dados & ORM**| **Prisma ORM 6** | Modelagem robusta de dados e consultas tipadas |
+| **Banco de Dados** | **SQLite** (`db/custom.db`) | Armazenamento local-first com latência sub-milissegundo |
+| **Validação de Esquemas** | **Zod 4** | Validação em runtime de rotas de API e contratos de predição |
+
+---
+
+## 📂 Estrutura de Diretórios
+
+```text
+preparacao_hyrox/
+├── prisma/
+│   ├── schema.prisma              # Schema do banco de dados relacional (Athlete, Meso, Micro, Session, etc.)
+│   └── seed.ts                    # Script de população científica das 28 semanas e 196 sessões
+├── db/
+│   └── custom.db                  # Banco de dados SQLite persistente
+├── specs/
+│   ├── 001-hyrox-race-predictor/  # Spec Kit do módulo preditivo fisiológico
+│   └── 002-profile-readme/        # Documentação e histórico do portfólio
+├── src/
+│   ├── app/
+│   │   ├── api/                   # Rotas REST (/api/plan, /api/dashboard, /api/sessions, /api/predictions)
+│   │   ├── layout.tsx             # Shell da aplicação com temas e provedores
+│   │   └── page.tsx               # SPA central com abas (Painel, Periodização, Diário, Previsão)
+│   ├── components/
+│   │   ├── training/              # Componentes de domínio esportivo
+│   │   │   ├── predictor-cards.tsx
+│   │   │   ├── predictor-segments-table.tsx
+│   │   │   ├── predictor-simulator.tsx
+│   │   │   ├── session-sheet.tsx
+│   │   │   ├── dashboard-tab.tsx
+│   │   │   └── charts.tsx
+│   │   └── ui/                    # Primitivas visuais do Design System (shadcn/ui)
+│   └── lib/
+│       ├── analytics.ts           # Motor de cálculo Foster, EWMA 42:7, ACWR e tonelagem
+│       ├── predictions.ts         # Motor de predição fisiológica e cenários HYROX
+│       ├── predictions-calc.ts    # Funções puras de cálculo de splits e fadiga
+│       └── constants.ts           # Constantes e validações de domínio
+├── worklog.md                     # Registro cronológico detalhado de desenvolvimento
+└── package.json                   # Dependências e scripts do projeto
+```
+
+---
+
+## 🚀 Como Executar o Projeto Localmente
+
+### Pré-requisitos
+- **Node.js** (v20 ou superior) ou **Bun** (v1.1 ou superior recomendado)
+- **Git**
+
+### Passo a Passo
+
+1. **Clonar o Repositório:**
+   ```bash
+   git clone https://github.com/Gegeu-sp/preparacao_hyrox.git
+   cd preparacao_hyrox
+   ```
+
+2. **Instalar Dependências:**
+   ```bash
+   bun install
+   # ou
+   npm install
+   ```
+
+3. **Configurar as Variáveis de Ambiente:**
+   Crie ou verifique o arquivo `.env` na raiz do projeto:
+   ```env
+   DATABASE_URL="file:./db/custom.db"
+   ```
+
+4. **Sincronizar o Banco de Dados Prisma:**
+   ```bash
+   bun run db:push
+   # ou
+   npx prisma db push
+   ```
+
+5. **(Opcional) Popular o Banco com a Periodização Completa:**
+   ```bash
+   bun run prisma/seed.ts
+   # ou
+   npx tsx prisma/seed.ts
+   ```
+
+6. **Iniciar o Servidor de Desenvolvimento:**
+   ```bash
+   bun run dev
+   # ou
+   npm run dev
+   ```
+
+7. **Acessar a Aplicação:**
+   Abra o navegador em [http://localhost:3000](http://localhost:3000).
+
+---
+
+## 🧪 Verificação de Qualidade e Linters
+
+Para executar a verificação estática de código e tipagem TypeScript:
+
+```bash
+# Executar o ESLint
+bun run lint
+
+# Checagem estrita de tipos
+npx tsc --noEmit
+```
 
 ---
 
 <!-- Rodapé Obrigatório -->
 <div align="center">
+
+---
 
 ### 👨‍💻 Projeto desenvolvido por Argeu Rodrigues
 **4º semestre de ADS na Faculdade Anhembi Morumbi**  
@@ -200,6 +269,6 @@ Hoje, aplico essa bagagem na **Engenharia de Software e Arquitetura de Sistemas*
 
 <br /><br />
 
-<sub>*"Continuous improvement is better than delayed perfection."*</sub>
+<sub>*"Onde a precisão da engenharia de software potencializa a ciência da performance humana."*</sub>
 
 </div>
